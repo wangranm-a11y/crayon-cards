@@ -31,6 +31,31 @@ window.CARDS = (function () {
       name: '杂志大字',
       previewBg: '#fafafa',
     },
+    // —— 新增 6 个 ——
+    minimal: {
+      name: '极简白',
+      previewBg: '#ffffff',
+    },
+    sunset: {
+      name: '晚霞',
+      previewBg: 'linear-gradient(180deg, #ffd6a0 0%, #ff8a9c 50%, #c084fc 100%)',
+    },
+    latte: {
+      name: '奶咖',
+      previewBg: 'linear-gradient(180deg, #f5e6d3 0%, #e8d0b3 100%)',
+    },
+    lavender: {
+      name: '薰衣草',
+      previewBg: 'linear-gradient(180deg, #f3eaff 0%, #e9d8ff 100%)',
+    },
+    neon: {
+      name: '暗夜霓虹',
+      previewBg: 'linear-gradient(180deg, #0a0a18 0%, #1a0a2e 100%)',
+    },
+    classical: {
+      name: '古籍',
+      previewBg: '#ede0c8',
+    },
   };
 
   /**

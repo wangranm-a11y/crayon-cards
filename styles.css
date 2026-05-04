@@ -719,6 +719,241 @@ input[type="text"]:focus { border-color: var(--accent); }
   box-shadow: 0 6px 0 rgba(26,26,26,0.5), 0 12px 0 rgba(26,26,26,0.5), 0 18px 0 rgba(26,26,26,0.4);
 }
 
+/* ==========================================================
+   主题 6：极简白
+   ========================================================== */
+.card-minimal {
+  background: #ffffff;
+  color: #1a1a1a;
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+.card-minimal .card-deco::before {
+  /* 顶部一道极细灰线 */
+  content: ''; position: absolute; left: 96px; right: 96px; top: 168px;
+  height: 1px; background: rgba(26,26,26,0.12);
+}
+.card-minimal .card-deco::after {
+  /* 底部一道极细灰线 */
+  content: ''; position: absolute; left: 96px; right: 96px; bottom: 130px;
+  height: 1px; background: rgba(26,26,26,0.12);
+}
+.card-minimal .card-stamp {
+  background: transparent;
+  color: #1a1a1a;
+  border: 1.5px solid #1a1a1a;
+}
+.card-minimal .card-stamp-dot { background: #1a1a1a; }
+.card-minimal .card-page { color: rgba(26,26,26,0.40); }
+
+.theme-minimal { background: #ffffff; border: 1px solid rgba(0,0,0,0.10); position: relative; }
+.theme-minimal::before { content: ''; position: absolute; left: 6px; top: 6px; width: 16px; height: 6px; border-radius: 3px; background: #1a1a1a; }
+.theme-minimal::after {
+  content: ''; position: absolute; left: 8px; top: 24px;
+  width: 36px; height: 2px; border-radius: 1px;
+  background: rgba(26,26,26,0.45);
+  box-shadow: 0 6px 0 rgba(26,26,26,0.45), 0 12px 0 rgba(26,26,26,0.45), 0 18px 0 rgba(26,26,26,0.32);
+}
+
+/* ==========================================================
+   主题 7：晚霞
+   ========================================================== */
+.card-sunset {
+  background: linear-gradient(180deg, #ffd6a0 0%, #ff8a9c 50%, #c084fc 100%);
+  color: #2a1830;
+}
+.card-sunset .card-deco {
+  background:
+    radial-gradient(circle at 80% 18%, rgba(255,255,255,0.55) 0%, transparent 22%),
+    radial-gradient(circle at 90% 16%, rgba(255,210,140,0.45) 0%, transparent 14%);
+}
+.card-sunset .card-stamp {
+  background: rgba(255,255,255,0.85);
+  color: #2a1830;
+  backdrop-filter: blur(8px);
+}
+.card-sunset .card-stamp-dot { background: #ee6a82; }
+.card-sunset .card-page { color: rgba(42,24,48,0.55); }
+
+.theme-sunset {
+  background: linear-gradient(180deg, #ffd6a0 0%, #ff8a9c 50%, #c084fc 100%);
+  position: relative;
+}
+.theme-sunset::before { content: ''; position: absolute; left: 6px; top: 6px; width: 16px; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.85); }
+.theme-sunset::after {
+  content: ''; position: absolute; left: 8px; top: 24px;
+  width: 36px; height: 2px; border-radius: 1px;
+  background: rgba(42,24,48,0.55);
+  box-shadow: 0 6px 0 rgba(42,24,48,0.55), 0 12px 0 rgba(42,24,48,0.55), 0 18px 0 rgba(42,24,48,0.40);
+}
+
+/* ==========================================================
+   主题 8：奶咖
+   ========================================================== */
+.card-latte {
+  background: linear-gradient(180deg, #f5e6d3 0%, #e8d0b3 100%);
+  color: #3e2918;
+}
+.card-latte .card-deco::before {
+  /* 右上角小咖啡杯印章 */
+  content: '☕'; position: absolute; top: 96px; right: 100px;
+  font-size: 56px; opacity: 0.30;
+}
+.card-latte .card-deco::after {
+  /* 一条手画蜿蜒细线 */
+  content: ''; position: absolute; left: 96px; right: 96px; top: 200px;
+  height: 1px; background: rgba(62,41,24,0.30);
+  box-shadow: 0 1190px 0 rgba(62,41,24,0.30);
+}
+.card-latte .card-stamp {
+  background: #3e2918;
+  color: #f5e6d3;
+}
+.card-latte .card-stamp-dot { background: #d4a574; }
+.card-latte .card-page { color: rgba(62,41,24,0.50); }
+
+.theme-latte { background: linear-gradient(180deg, #f5e6d3, #e8d0b3); position: relative; }
+.theme-latte::before { content: ''; position: absolute; left: 6px; top: 6px; width: 16px; height: 6px; border-radius: 3px; background: #3e2918; }
+.theme-latte::after {
+  content: ''; position: absolute; left: 8px; top: 24px;
+  width: 36px; height: 2px; border-radius: 1px;
+  background: rgba(62,41,24,0.45);
+  box-shadow: 0 6px 0 rgba(62,41,24,0.45), 0 12px 0 rgba(62,41,24,0.45), 0 18px 0 rgba(62,41,24,0.32);
+}
+
+/* ==========================================================
+   主题 9：薰衣草
+   ========================================================== */
+.card-lavender {
+  background: linear-gradient(180deg, #f3eaff 0%, #e9d8ff 100%);
+  color: #3d2e5e;
+}
+.card-lavender .card-deco {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(168,135,232,0.38) 0%, transparent 18%),
+    radial-gradient(circle at 12% 88%, rgba(255,184,216,0.32) 0%, transparent 22%);
+}
+.card-lavender .card-deco::after {
+  /* 角落小花 */
+  content: '✿'; position: absolute; top: 92px; right: 96px;
+  font-size: 38px; color: #a98be0; opacity: 0.55;
+}
+.card-lavender .card-stamp {
+  background: rgba(255,255,255,0.85);
+  color: #3d2e5e;
+  border: 1.5px solid rgba(61,46,94,0.20);
+}
+.card-lavender .card-stamp-dot { background: #a98be0; }
+.card-lavender .card-page { color: rgba(61,46,94,0.45); }
+
+.theme-lavender { background: linear-gradient(180deg, #f3eaff, #e9d8ff); position: relative; }
+.theme-lavender::before { content: ''; position: absolute; left: 6px; top: 6px; width: 16px; height: 6px; border-radius: 3px; background: #3d2e5e; }
+.theme-lavender::after {
+  content: ''; position: absolute; left: 8px; top: 24px;
+  width: 36px; height: 2px; border-radius: 1px;
+  background: rgba(61,46,94,0.45);
+  box-shadow: 0 6px 0 rgba(61,46,94,0.45), 0 12px 0 rgba(61,46,94,0.45), 0 18px 0 rgba(61,46,94,0.32);
+}
+
+/* ==========================================================
+   主题 10：暗夜霓虹
+   ========================================================== */
+.card-neon {
+  background:
+    radial-gradient(ellipse at 30% 0%, rgba(255,77,141,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 100%, rgba(77,255,208,0.14) 0%, transparent 50%),
+    linear-gradient(180deg, #0a0a18 0%, #1a0a2e 100%);
+  color: #f0e8ff;
+}
+.card-neon .card-deco {
+  background-image:
+    linear-gradient(rgba(255,77,141,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77,255,208,0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.card-neon .card-deco::after {
+  /* 右下角霓虹符号 */
+  content: '✦'; position: absolute; bottom: 80px; left: 90px;
+  font-size: 42px; color: #ff4d8d;
+  text-shadow: 0 0 20px rgba(255,77,141,0.85), 0 0 40px rgba(255,77,141,0.55);
+}
+.card-neon .card-stamp {
+  background: rgba(255,77,141,0.15);
+  color: #ff4d8d;
+  border: 1.5px solid #ff4d8d;
+  text-shadow: 0 0 12px rgba(255,77,141,0.65);
+  box-shadow: 0 0 20px rgba(255,77,141,0.25);
+}
+.card-neon .card-stamp-dot { background: #4dffd0; box-shadow: 0 0 10px #4dffd0; }
+.card-neon .card-page {
+  color: #4dffd0;
+  text-shadow: 0 0 10px rgba(77,255,208,0.55);
+}
+
+.theme-neon {
+  background: linear-gradient(180deg, #0a0a18, #1a0a2e);
+  position: relative;
+  border: 1px solid rgba(255,77,141,0.30);
+  box-shadow: 0 0 12px rgba(255,77,141,0.15);
+}
+.theme-neon::before { content: ''; position: absolute; left: 6px; top: 6px; width: 16px; height: 6px; border-radius: 3px; background: #ff4d8d; box-shadow: 0 0 6px rgba(255,77,141,0.65); }
+.theme-neon::after {
+  content: ''; position: absolute; left: 8px; top: 24px;
+  width: 36px; height: 2px; border-radius: 1px;
+  background: rgba(240,232,255,0.55);
+  box-shadow: 0 6px 0 rgba(240,232,255,0.55), 0 12px 0 rgba(240,232,255,0.55), 0 18px 0 rgba(240,232,255,0.40);
+}
+
+/* ==========================================================
+   主题 11：古籍
+   ========================================================== */
+.card-classical {
+  background:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 1080 1440' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.45 0 0 0 0 0.30 0 0 0 0.13 0'/%3E%3C/filter%3E%3Crect width='1080' height='1440' filter='url(%23n)'/%3E%3C/svg%3E"),
+    #ede0c8;
+  color: #2a1810;
+  font-family: var(--font-serif);
+  font-weight: 500;
+}
+.card-classical .card-deco::before {
+  /* 左侧竖排装饰线 */
+  content: ''; position: absolute; left: 60px; top: 220px; width: 4px; bottom: 200px;
+  background: rgba(176,48,32,0.55);
+}
+.card-classical .card-deco::after {
+  /* 右下角古印章 */
+  content: '钤'; position: absolute; bottom: 88px; left: 92px;
+  width: 56px; height: 56px;
+  background: #b03020; color: #ede0c8;
+  font-size: 32px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 4px;
+  font-family: var(--font-serif);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.18);
+}
+.card-classical .card-stamp {
+  background: #2a1810;
+  color: #ede0c8;
+  font-family: var(--font-serif);
+  font-weight: 600;
+}
+.card-classical .card-stamp-dot { background: #b03020; }
+.card-classical .card-page { color: rgba(42,24,16,0.50); font-family: var(--font-serif); }
+
+.theme-classical { background: #ede0c8; position: relative; }
+.theme-classical::before { content: ''; position: absolute; left: 6px; top: 6px; width: 16px; height: 6px; border-radius: 3px; background: #2a1810; }
+.theme-classical::after {
+  content: ''; position: absolute; left: 8px; top: 24px;
+  width: 36px; height: 2px; border-radius: 1px;
+  background: rgba(42,24,16,0.50);
+  box-shadow: 0 6px 0 rgba(42,24,16,0.50), 0 12px 0 rgba(42,24,16,0.50), 0 18px 0 rgba(42,24,16,0.36);
+}
+.theme-classical-strip {
+  /* 缩略图加一条左侧红条 */
+  position: absolute; left: 6px; bottom: 6px; width: 3px; top: 36px;
+  background: #b03020;
+}
+
 /* —— 富文本内 inline 元素全部生效 —— */
 .card-content strong, .card-content b { font-weight: 700; }
 .card-content em, .card-content i { font-style: italic; }
@@ -751,6 +986,12 @@ input[type="text"]:focus { border-color: var(--accent); }
 .card-pastel { --card-accent: #ff7a9a; }
 .card-charcoal { --card-accent: #c64f1f; }
 .card-magazine { --card-accent: #ff4040; }
+.card-minimal { --card-accent: #1a1a1a; }
+.card-sunset { --card-accent: #ee6a82; }
+.card-latte { --card-accent: #d4a574; }
+.card-lavender { --card-accent: #a98be0; }
+.card-neon { --card-accent: #ff4d8d; }
+.card-classical { --card-accent: #b03020; }
 
 /* 杂志主题：标题极重，黑底色 */
 .card-magazine .card-content > h1.cover-title-inline {
