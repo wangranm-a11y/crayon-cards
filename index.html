@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#fbf6e9" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="蜡笔卡" />
+  <title>蜡笔卡 · 文字一秒变小红书图文</title>
+
+  <meta name="description" content="把一段文字自动切成小红书 3:4 比例的精美卡片。5 个主题可选，左上角自动盖印你的昵称。零安装、纯网页、移动端友好。" />
+  <meta property="og:title" content="蜡笔卡 · 文字一秒变小红书图文" />
+  <meta property="og:description" content="把一段文字自动切成小红书 3:4 比例的精美卡片。" />
+  <meta property="og:type" content="website" />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-192.svg" />
+  <link rel="stylesheet" href="styles.css?v=1" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <span class="brand-name">蜡笔卡</span>
+      <span class="brand-tag">v1</span>
+    </div>
+    <a class="brand-by" href="#about">蜡笔不拿笔 出品</a>
+  </header>
+
+  <main>
+
+    <!-- ============ 编辑器 ============ -->
+    <section id="editorView">
+
+      <h1 class="hero-title">文字 → 小红书图文</h1>
+      <p class="hero-sub">粘贴一段话，自动切成 3:4 比例的精美卡片。<br>左上角已经替你盖好「蜡笔不拿笔」的章。</p>
+
+      <!-- 标题输入（可选）-->
+      <label class="field">
+        <span class="field-label">标题（可选 · 第 1 张大字显示）</span>
+        <input type="text" id="titleInput" placeholder="比如：今天的小确幸" maxlength="36" />
+      </label>
+
+      <!-- 正文 -->
+      <label class="field">
+        <span class="field-label">正文 <span class="char-count" id="charCount">0 字</span></span>
+        <textarea id="textInput" rows="12" placeholder="把你想分享的文字粘贴在这里。
+
+段落之间空一行，会被识别为新段落。
+
+字数到了一定长度（默认 220 字）会自动切到下一张卡片。"></textarea>
+      </label>
+
+      <!-- 试一下 -->
+      <div class="samples">
+        <span class="samples-label">没灵感？试试 →</span>
+        <button class="sample-btn">关于「我丢」</button>
+        <button class="sample-btn">今天的小确幸</button>
+      </div>
+
+      <!-- 主题选择 -->
+      <div class="field">
+        <span class="field-label">挑个主题</span>
+        <div class="theme-picker" id="themePicker"></div>
+      </div>
+
+      <!-- 高级设置 -->
+      <details class="advanced">
+        <summary>更多设置</summary>
+        <label class="field">
+          <span class="field-label">昵称（左上角）</span>
+          <input type="text" id="nicknameInput" maxlength="14" />
+        </label>
+        <label class="field">
+          <span class="field-label">每张卡字数 <span class="char-count" id="charLimitNum">220</span></span>
+          <input type="range" id="charLimit" min="80" max="400" step="10" />
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="showPage" />
+          <span>显示页码（X / N）</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="showNickname" />
+          <span>显示昵称印章</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="autoCover" />
+          <span>第 1 张作为封面（标题大字）</span>
+        </label>
+      </details>
+
+      <div class="actions">
+        <button class="btn-ghost" id="clearBtn">清空</button>
+        <button class="btn-primary" id="generateBtn">生成卡片 →</button>
+      </div>
+
+      <!-- About small -->
+      <div class="about-small" id="about">
+        <p><b>关于</b>　这是一个超轻的小工具：把你想发的文字粘进去，一键变成小红书风格的 3:4 卡片。每张图自动盖上你的昵称印章。</p>
+        <p>所有处理都在你的浏览器里完成，<b>不上传任何文字到服务器</b>。</p>
+        <p>由「<a href="https://github.com/wangranm-a11y/wodiu" target="_blank">我丢</a>」作者顺手做的。</p>
+      </div>
+
+    </section>
+
+    <!-- ============ 预览 ============ -->
+    <section id="previewView" hidden>
+
+      <div class="preview-head">
+        <button class="btn-ghost small" id="backToEdit">← 改一下</button>
+        <span class="preview-count" id="previewCount"></span>
+        <button class="btn-primary small" id="downloadAll">⬇ 全部保存</button>
+      </div>
+
+      <div class="cards-list" id="cardsList"></div>
+
+      <p class="preview-tip">点单张右上角 ⬇ 可以单张保存。</p>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="cards.js?v=1"></script>
+  <script src="app.js?v=1"></script>
+
+  <script>
+    // PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(()=>{});
+      });
+    }
+  </script>
+</body>
+</html>
