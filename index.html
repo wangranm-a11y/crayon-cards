@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="蜡笔卡" />
   <title>蜡笔卡 · 文字一秒变小红书图文</title>
 
-  <meta name="description" content="把一段文字自动切成小红书 3:4 比例的精美卡片。5 个主题可选，左上角自动盖印你的昵称。零安装、纯网页、移动端友好。" />
+  <meta name="description" content="把一段文字自动切成小红书 3:4 比例的精美卡片。支持富文本、图片、5 个主题，左上角自动盖印你的昵称。" />
   <meta property="og:title" content="蜡笔卡 · 文字一秒变小红书图文" />
   <meta property="og:description" content="把一段文字自动切成小红书 3:4 比例的精美卡片。" />
   <meta property="og:type" content="website" />
@@ -16,7 +16,10 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon-192.svg" />
-  <link rel="stylesheet" href="styles.css?v=1" />
+  <link rel="stylesheet" href="styles.css?v=3" />
+
+  <!-- html2canvas: DOM → PNG -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -24,58 +27,77 @@
     <div class="brand">
       <span class="brand-dot"></span>
       <span class="brand-name">蜡笔卡</span>
-      <span class="brand-tag">v1</span>
+      <span class="brand-tag">v2</span>
     </div>
     <a class="brand-by" href="#about">蜡笔不拿笔 出品</a>
   </header>
 
   <main>
 
-    <!-- ============ 编辑器 ============ -->
+    <!-- ============ Editor ============ -->
     <section id="editorView">
 
       <h1 class="hero-title">文字 → 小红书图文</h1>
-      <p class="hero-sub">粘贴一段话，自动切成 3:4 比例的精美卡片。<br>左上角已经替你盖好「蜡笔不拿笔」的章。</p>
+      <p class="hero-sub">支持粗体 / 斜体 / 下划线 / 颜色 / 图片，粘贴自动保留格式。<br>每张卡按内容真实高度自动切，每页字号统一。</p>
 
-      <!-- 标题输入（可选）-->
+      <!-- 标题 -->
       <label class="field">
-        <span class="field-label">标题（可选 · 第 1 张大字显示）</span>
+        <span class="field-label">标题（可选 · 第 1 张大字封面）</span>
         <input type="text" id="titleInput" placeholder="比如：今天的小确幸" maxlength="36" />
       </label>
 
-      <!-- 正文 -->
-      <label class="field">
+      <!-- 富文本编辑器 -->
+      <div class="field">
         <span class="field-label">正文 <span class="char-count" id="charCount">0 字</span></span>
-        <textarea id="textInput" rows="12" placeholder="把你想分享的文字粘贴在这里。
 
-段落之间空一行，会被识别为新段落。
+        <div class="editor-card">
+          <!-- 工具栏 -->
+          <div class="rich-toolbar" id="toolbar">
+            <button type="button" class="rt-btn" data-cmd="bold" title="加粗 (⌘B)"><b>B</b></button>
+            <button type="button" class="rt-btn italic" data-cmd="italic" title="斜体 (⌘I)">I</button>
+            <button type="button" class="rt-btn underline" data-cmd="underline" title="下划线 (⌘U)">U</button>
+            <span class="rt-divider"></span>
 
-字数到了一定长度（默认 220 字）会自动切到下一张卡片。"></textarea>
-      </label>
+            <label class="rt-color-wrap" title="字体颜色">
+              <span class="rt-color-icon" id="colorIcon" style="color:#c84b31;"></span>
+              <input type="color" id="textColor" value="#c84b31" />
+            </label>
 
-      <!-- 试一下 -->
-      <div class="samples">
-        <span class="samples-label">没灵感？试试 →</span>
-        <button class="sample-btn">关于「我丢」</button>
-        <button class="sample-btn">今天的小确幸</button>
+            <button type="button" class="rt-btn" id="insertImage" title="插入图片">📷</button>
+
+            <span class="rt-divider"></span>
+            <button type="button" class="rt-btn" data-cmd="insertUnorderedList" title="项目列表">•</button>
+            <button type="button" class="rt-btn" data-cmd="formatBlock" data-arg="blockquote" title="引言">"</button>
+            <button type="button" class="rt-btn" data-cmd="removeFormat" title="清除格式">✕</button>
+
+            <input type="file" id="imageFile" accept="image/*" hidden multiple />
+          </div>
+
+          <!-- contenteditable -->
+          <div id="editor"
+               contenteditable="true"
+               data-placeholder="把你想分享的文字粘贴在这里。支持加粗、斜体、颜色、图片。"></div>
+        </div>
       </div>
 
-      <!-- 主题选择 -->
+      <div class="samples">
+        <span class="samples-label">没灵感？试试 →</span>
+        <button class="sample-btn" data-sample="0">关于「我丢」</button>
+        <button class="sample-btn" data-sample="1">今天的小确幸</button>
+      </div>
+
+      <!-- 主题 -->
       <div class="field">
         <span class="field-label">挑个主题</span>
         <div class="theme-picker" id="themePicker"></div>
       </div>
 
-      <!-- 高级设置 -->
+      <!-- 高级 -->
       <details class="advanced">
         <summary>更多设置</summary>
         <label class="field">
-          <span class="field-label">昵称（左上角）</span>
+          <span class="field-label">昵称（左上角印章）</span>
           <input type="text" id="nicknameInput" maxlength="14" />
-        </label>
-        <label class="field">
-          <span class="field-label">每张卡字数 <span class="char-count" id="charLimitNum">220</span></span>
-          <input type="range" id="charLimit" min="80" max="400" step="10" />
         </label>
         <label class="check-row">
           <input type="checkbox" id="showPage" />
@@ -96,7 +118,6 @@
         <button class="btn-primary" id="generateBtn">生成卡片 →</button>
       </div>
 
-      <!-- About small -->
       <div class="about-small" id="about">
         <p><b>关于</b>　这是一个超轻的小工具：把你想发的文字粘进去，一键变成小红书风格的 3:4 卡片。每张图自动盖上你的昵称印章。</p>
         <p>所有处理都在你的浏览器里完成，<b>不上传任何文字到服务器</b>。</p>
@@ -105,29 +126,25 @@
 
     </section>
 
-    <!-- ============ 预览 ============ -->
+    <!-- ============ Preview ============ -->
     <section id="previewView" hidden>
-
       <div class="preview-head">
         <button class="btn-ghost small" id="backToEdit">← 改一下</button>
         <span class="preview-count" id="previewCount"></span>
         <button class="btn-primary small" id="downloadAll">⬇ 全部保存</button>
       </div>
-
       <div class="cards-list" id="cardsList"></div>
-
-      <p class="preview-tip">点单张右上角 ⬇ 可以单张保存。</p>
+      <p class="preview-tip">单张点 ⬇ 保存。所有处理在本地，无上传。</p>
     </section>
 
   </main>
 
   <div class="toast" id="toast"></div>
 
-  <script src="cards.js?v=1"></script>
-  <script src="app.js?v=1"></script>
+  <script src="cards.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 
   <script>
-    // PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(()=>{});

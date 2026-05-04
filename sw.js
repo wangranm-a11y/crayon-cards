@@ -1,4 +1,4 @@
-const CACHE = 'crayon-cards-v1';
+const CACHE = 'crayon-cards-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -14,17 +14,40 @@ self.addEventListener('install', e => {
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).catch(() => {}));
 });
+
 self.addEventListener('activate', e => {
   e.waitUntil(
     Promise.all([
-      caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))),
+      // 立刻删除所有旧缓存
+      caches.keys().then(keys =>
+        Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      ),
       self.clients.claim(),
     ])
   );
 });
+
+// —— 网络优先 ——
+// 在线时永远拿最新（开发改了立刻生效）
+// 离线时回退到缓存（保留 PWA 体验）
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  // 跳过非同源（如 html2canvas CDN）
+  const url = new URL(e.request.url);
+  if (url.origin !== self.location.origin) return;
+
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./index.html')))
+    fetch(e.request)
+      .then(res => {
+        // 后台更新缓存
+        if (res && res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone)).catch(() => {});
+        }
+        return res;
+      })
+      .catch(() =>
+        caches.match(e.request).then(r => r || caches.match('./index.html'))
+      )
   );
 });
