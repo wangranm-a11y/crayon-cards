@@ -72,12 +72,19 @@ window.CARDS = (function () {
       pageIndex = 0, totalPages = 1,
       showPage = true, showNickname = true,
       tag = '', font = 'default',
+      textColor = 'default',
     } = opts;
     const card = document.createElement('div');
     let cls = `card card-${themeKey}`;
     if (font && font !== 'default') cls += ` card-font-${font}`;
     card.className = cls;
     card.setAttribute('data-theme', themeKey);
+
+    // 全局正文颜色覆盖（继承 + CSS 变量双管齐下，覆盖各主题已显式设置的 p/blockquote 色）
+    if (textColor && textColor !== 'default') {
+      card.style.color = textColor;
+      card.style.setProperty('--card-text-color', textColor);
+    }
 
     // 装饰层（顶/底装饰线、星点）
     const deco = document.createElement('div');

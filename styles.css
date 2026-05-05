@@ -299,6 +299,77 @@ input[type="text"]:focus { border-color: var(--accent); }
   box-shadow: 0 0 0 2px rgba(200,75,49,0.18);
 }
 
+/* ============ Text Color Picker ============ */
+.text-color-picker {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+}
+.tc-btn {
+  padding: 8px 14px;
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-pill);
+  color: var(--ink-soft);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tc-btn:hover { border-color: var(--accent); color: var(--accent); }
+.tc-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.tc-swatch {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  transition: transform 0.12s, box-shadow 0.15s;
+}
+.tc-swatch:hover { transform: scale(1.08); }
+.tc-swatch.active {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+  border-color: transparent;
+}
+.tc-swatch.active::after {
+  content: '✓';
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 14px; font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.tc-custom {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px 6px 8px;
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: border-color 0.15s;
+  font-size: 13px;
+  color: var(--ink-soft);
+  position: relative;
+}
+.tc-custom:hover { border-color: var(--accent); color: var(--accent); }
+.tc-custom.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(200,75,49,0.18);
+}
+.tc-custom-icon {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  display: inline-block;
+  flex-shrink: 0;
+}
+.tc-custom input[type="color"] {
+  position: absolute; inset: 0;
+  opacity: 0; cursor: pointer;
+}
+
 /* ============ Advanced ============ */
 .advanced {
   border: 1px solid var(--line);
@@ -1086,7 +1157,7 @@ input[type="text"]:focus { border-color: var(--accent); }
   margin: 0 0 28px;
   font-size: 40px;
   line-height: 1.85;
-  color: #5d3f25;                /* 棕色正文 */
+  color: var(--card-text-color, #5d3f25);   /* 默认棕色，可被全局正文色覆盖 */
   font-weight: 400;
 }
 .card-editorial .card-content > p:last-child { margin-bottom: 0; }
@@ -1134,7 +1205,7 @@ input[type="text"]:focus { border-color: var(--accent); }
   font-style: normal;
   font-size: 36px;
   line-height: 1.7;
-  color: #3a2a1a;
+  color: var(--card-text-color, #3a2a1a);
   font-family: var(--font-serif);
   font-weight: 500;
   opacity: 1;

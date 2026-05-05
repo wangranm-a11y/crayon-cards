@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=10" />
+  <link rel="stylesheet" href="styles.css?v=11" />
 
   <!-- html2canvas: DOM → PNG -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -112,6 +112,24 @@
         </div>
       </div>
 
+      <!-- 正文颜色 -->
+      <div class="field">
+        <span class="field-label">正文颜色（整张卡的字色，工具栏调色管单段）</span>
+        <div class="text-color-picker" id="textColorPicker">
+          <button type="button" class="tc-btn" data-color="default">主题默认</button>
+          <button type="button" class="tc-swatch" data-color="#5d3f25" style="background:#5d3f25" title="暖棕"></button>
+          <button type="button" class="tc-swatch" data-color="#1a1410" style="background:#1a1410" title="深黑"></button>
+          <button type="button" class="tc-swatch" data-color="#2c5f3f" style="background:#2c5f3f" title="墨绿"></button>
+          <button type="button" class="tc-swatch" data-color="#1e3a5f" style="background:#1e3a5f" title="藏蓝"></button>
+          <button type="button" class="tc-swatch" data-color="#6b1f2a" style="background:#6b1f2a" title="暗红"></button>
+          <label class="tc-custom" id="tcCustom" title="自定义颜色">
+            <span class="tc-custom-icon" id="tcCustomIcon" style="background:#888"></span>
+            <span>自定义</span>
+            <input type="color" id="tcCustomInput" value="#5d3f25" />
+          </label>
+        </div>
+      </div>
+
       <!-- 高级 -->
       <details class="advanced">
         <summary>更多设置</summary>
@@ -161,8 +179,8 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="cards.js?v=10"></script>
-  <script src="app.js?v=10"></script>
+  <script src="cards.js?v=11"></script>
+  <script src="app.js?v=11"></script>
 
   <script>
     if ('serviceWorker' in navigator) {

@@ -15,6 +15,7 @@
     nickname: localStorage.getItem('cc.nickname') || '蜡笔不拿笔',
     theme: localStorage.getItem('cc.theme') || 'cream',
     font: localStorage.getItem('cc.font') || 'default',
+    textColor: localStorage.getItem('cc.textColor') || 'default',
     tag: localStorage.getItem('cc.tag') || '',
     showPage: true,
     showNickname: true,
@@ -58,6 +59,42 @@
         if (!$('#previewView').hidden) regenerate();
       });
     });
+  }
+
+  // Text color picker
+  const tcWrap = $('#textColorPicker');
+  if (tcWrap) {
+    const tcInput  = $('#tcCustomInput');
+    const tcCustom = $('#tcCustom');
+    const tcCustomIcon = $('#tcCustomIcon');
+
+    function activateTc(el, color) {
+      tcWrap.querySelectorAll('.tc-btn, .tc-swatch, .tc-custom').forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+      state.textColor = color;
+      localStorage.setItem('cc.textColor', state.textColor);
+      if (!$('#previewView').hidden) regenerate();
+    }
+
+    // 初始化激活态
+    const presetMatch = tcWrap.querySelector(`[data-color="${state.textColor}"]`);
+    if (presetMatch) presetMatch.classList.add('active');
+    else if (state.textColor !== 'default' && tcCustom) {
+      tcCustom.classList.add('active');
+      if (tcInput) tcInput.value = state.textColor;
+      if (tcCustomIcon) tcCustomIcon.style.background = state.textColor;
+    }
+
+    tcWrap.querySelectorAll('.tc-btn, .tc-swatch').forEach(b => {
+      b.addEventListener('click', () => activateTc(b, b.dataset.color));
+    });
+    if (tcInput) {
+      tcInput.addEventListener('input', e => {
+        const color = e.target.value;
+        if (tcCustomIcon) tcCustomIcon.style.background = color;
+        activateTc(tcCustom, color);
+      });
+    }
   }
 
   // 渲染主题选项
@@ -340,6 +377,7 @@
       showNickname: state.showNickname,
       tag: state.tag,
       font: state.font,
+      textColor: state.textColor,
     };
 
     // 1. 准备拆页输入（如果有标题，把它作为大字 H1 加在最前面，
