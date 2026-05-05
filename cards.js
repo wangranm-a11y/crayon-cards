@@ -131,30 +131,128 @@ window.CARDS = (function () {
       return content.scrollHeight <= content.clientHeight + 2; // 2px 容差
     }
 
-    for (const block of blocks) {
+    // 把一个块拆成「token」序列：保留行内格式（<b>/<i>/<u>/<span>），
+    // 对纯文本节点按句号 / 感叹号 / 问号 / 换行切分。
+    function tokenizeBlock(block) {
+      const tokens = [];
+      for (const child of Array.from(block.childNodes)) {
+        if (child.nodeType === Node.TEXT_NODE) {
+          const text = child.textContent;
+          if (!text) continue;
+          // 按句末标点切，保留分隔符
+          const parts = text.split(/(?<=[。！？.!?\n])/);
+          for (const p of parts) {
+            if (!p) continue;
+            tokens.push({
+              html: escapeHtml(p),
+              endsAtBoundary: /[。！？.!?\n]$/.test(p),
+            });
+          }
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          tokens.push({ html: child.outerHTML, endsAtBoundary: false });
+        }
+      }
+      return tokens;
+    }
+
+    // 贪心地把一个塞不下的块按句号填到当前卡的剩余空间里，
+    // 返回 { fitted: bool, remainder: HTMLElement | null }
+    // fitted=true 表示「至少有一句被塞进了当前卡」，buffer 已被 push。
+    function greedyPackSentences(block) {
+      // 不可拆类型：图片 / 横线 → 让外层走拆块或新开一页
+      if (block.tagName === 'IMG' || block.tagName === 'HR') {
+        return { fitted: false, remainder: block };
+      }
+
+      const tokens = tokenizeBlock(block);
+      if (tokens.length <= 1) return { fitted: false, remainder: block };
+
+      let fittedHTML = '';
+      let lastBoundaryHTML = '';
+      let lastBoundaryIdx = -1;
+
+      for (let i = 0; i < tokens.length; i++) {
+        const cloneEl = block.cloneNode(false);
+        cloneEl.innerHTML = fittedHTML + tokens[i].html;
+        if (tryFit(cloneEl.outerHTML)) {
+          fittedHTML += tokens[i].html;
+          if (tokens[i].endsAtBoundary) {
+            lastBoundaryHTML = fittedHTML;
+            lastBoundaryIdx = i;
+          }
+        } else {
+          break;
+        }
+      }
+
+      if (lastBoundaryIdx < 0) {
+        // 当前卡空间连一句话都装不下 → 让外层处理
+        return { fitted: false, remainder: block };
+      }
+
+      // 把「到最后一个完整句子为止」推入当前卡
+      const fittedEl = block.cloneNode(false);
+      fittedEl.innerHTML = lastBoundaryHTML;
+      buffer.push(fittedEl.outerHTML);
+
+      // 剩下的句子拼成新块，作为 remainder 留给后续卡
+      const remainingTokens = tokens.slice(lastBoundaryIdx + 1);
+      if (remainingTokens.length === 0) {
+        return { fitted: true, remainder: null };
+      }
+      const remainderHTML = remainingTokens.map(t => t.html).join('');
+      if (!remainderHTML.replace(/\s/g, '')) {
+        return { fitted: true, remainder: null };
+      }
+      const remainder = block.cloneNode(false);
+      remainder.innerHTML = remainderHTML;
+      return { fitted: true, remainder };
+    }
+
+    // 用队列处理：remainder 会被 unshift 回去，下一轮在新卡上继续填
+    const queue = blocks.slice();
+
+    while (queue.length > 0) {
+      const block = queue.shift();
       const html = block.outerHTML;
+
+      // 1) 整块能塞进当前卡 → 直接塞
       if (tryFit(html)) {
         buffer.push(html);
         continue;
       }
-      // 装不下：先 commit 当前页（如果有内容）
+
+      // 2) 当前卡已有内容 → 先尝试句级贪心填满
       if (buffer.length > 0) {
+        const r = greedyPackSentences(block);
+        if (r.fitted) {
+          commit();
+          if (r.remainder) queue.unshift(r.remainder);
+          continue;
+        }
+        // 一句都塞不下 → 提交当前卡，下一轮在空卡上重试
         commit();
       }
-      // 现在 buffer 为空，再试一次
+
+      // 3) buffer 为空，再试一次整块
       if (tryFit(html)) {
         buffer.push(html);
-      } else {
-        // 单个块都装不下 → 拆它
-        const subBlocks = splitOneBlock(block, content);
-        for (const sub of subBlocks) {
-          if (tryFit(sub.outerHTML)) {
-            buffer.push(sub.outerHTML);
-          } else {
-            commit();
-            buffer.push(sub.outerHTML);
-          }
-        }
+        continue;
+      }
+
+      // 4) 空卡仍装不下 → 先尝试句级贪心填空卡
+      const r2 = greedyPackSentences(block);
+      if (r2.fitted) {
+        commit();
+        if (r2.remainder) queue.unshift(r2.remainder);
+        continue;
+      }
+
+      // 5) 句级也搞不定（无句号的极长一句 / 图片） → 走兜底拆块
+      const subBlocks = splitOneBlock(block, content);
+      // 反向 unshift，保持顺序
+      for (let i = subBlocks.length - 1; i >= 0; i--) {
+        queue.unshift(subBlocks[i]);
       }
     }
     commit();
