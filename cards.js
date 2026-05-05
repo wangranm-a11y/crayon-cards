@@ -131,8 +131,14 @@ window.CARDS = (function () {
       return content.scrollHeight <= content.clientHeight + 2; // 2px 容差
     }
 
+    // 行内格式标签（不当作断点）；其他元素子（如 <li>/<p>/<div>）算天然断点
+    const INLINE_TAGS = new Set([
+      'B','I','U','EM','STRONG','SPAN','A','CODE','SMALL',
+      'SUB','SUP','MARK','FONT','S','STRIKE','DEL','INS','Q'
+    ]);
+
     // 把一个块拆成「token」序列：保留行内格式（<b>/<i>/<u>/<span>），
-    // 对纯文本节点按句号 / 感叹号 / 问号 / 换行切分。
+    // 纯文本按句号 / ！？ / 换行切；非行内子元素（如 <li>）算断点。
     function tokenizeBlock(block) {
       const tokens = [];
       for (const child of Array.from(block.childNodes)) {
@@ -149,7 +155,10 @@ window.CARDS = (function () {
             });
           }
         } else if (child.nodeType === Node.ELEMENT_NODE) {
-          tokens.push({ html: child.outerHTML, endsAtBoundary: false });
+          // 行内格式（<b>/<i>/<span>...）不是断点；
+          // 块级子元素（<li>/<p>/<div>/<br>）是天然断点
+          const isInline = INLINE_TAGS.has(child.tagName);
+          tokens.push({ html: child.outerHTML, endsAtBoundary: !isInline });
         }
       }
       return tokens;
