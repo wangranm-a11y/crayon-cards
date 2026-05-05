@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=11" />
+  <link rel="stylesheet" href="styles.css?v=12" />
 
   <!-- html2canvas: DOM → PNG -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -41,7 +41,7 @@
     <section id="editorView">
 
       <h1 class="hero-title">文字 → 小红书图文</h1>
-      <p class="hero-sub">支持粗体 / 斜体 / 下划线 / 颜色 / 图片，粘贴自动保留格式。<br>每张卡按内容真实高度自动切，每页字号统一。</p>
+      <p class="hero-sub">支持粗体 / 斜体 / 下划线 / 图片，粘贴自动保留格式。<br><b>单段染色</b>：选中文字 → 点工具栏 <span style="font-family:var(--font-serif);font-weight:800;border-bottom:3px solid var(--accent);padding-bottom:1px;">A</span> 给那段单独换色。</p>
 
       <!-- 标题 -->
       <label class="field">
@@ -67,7 +67,7 @@
             <button type="button" class="rt-btn underline" data-cmd="underline" title="下划线 (⌘U)">U</button>
             <span class="rt-divider"></span>
 
-            <label class="rt-color-wrap" title="字体颜色">
+            <label class="rt-color-wrap" title="单段染色：先选中要染色的文字，再点这里挑色">
               <span class="rt-color-icon" id="colorIcon" style="color:#c84b31;"></span>
               <input type="color" id="textColor" value="#c84b31" />
             </label>
@@ -179,8 +179,8 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="cards.js?v=11"></script>
-  <script src="app.js?v=11"></script>
+  <script src="cards.js?v=12"></script>
+  <script src="app.js?v=12"></script>
 
   <script>
     if ('serviceWorker' in navigator) {

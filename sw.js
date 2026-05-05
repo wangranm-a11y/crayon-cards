@@ -1,4 +1,4 @@
-const CACHE = 'crayon-cards-v11';
+const CACHE = 'crayon-cards-v12';
 const ASSETS = [
   './',
   './index.html',
