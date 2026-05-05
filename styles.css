@@ -470,6 +470,10 @@ input[type="text"]:focus { border-color: var(--accent); }
 .card-content > ol li {
   margin-bottom: 12px;
 }
+/* 拆出来的单 item 列表 → 相邻无缝衔接，看起来像一个连续列表 */
+.card-content > [data-li-flat] { margin-bottom: 0; }
+.card-content > [data-li-flat] li { margin-bottom: 12px; }
+.card-content > [data-li-flat]:last-child li:last-child { margin-bottom: 0; }
 .card-content > img {
   max-width: 100%;
   max-height: 60%;

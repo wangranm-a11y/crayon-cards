@@ -138,35 +138,63 @@ window.CARDS = (function () {
     ]);
 
     // 把一个块拆成「token」序列：保留行内格式（<b>/<i>/<u>/<span>），
-    // 纯文本按句号 / ！？ / 换行切；非行内子元素（如 <li>）算断点。
+    // 纯文本按句号 / ！？ / 分号 / 换行切；非行内子元素（如 <li>）算断点。
     function tokenizeBlock(block) {
       const tokens = [];
       for (const child of Array.from(block.childNodes)) {
         if (child.nodeType === Node.TEXT_NODE) {
           const text = child.textContent;
           if (!text) continue;
-          // 按句末标点切，保留分隔符
-          const parts = text.split(/(?<=[。！？.!?\n])/);
+          // 句末标点 + 分号 + 换行切，保留分隔符
+          const parts = text.split(/(?<=[。！？.!?；;\n])/);
           for (const p of parts) {
             if (!p) continue;
             tokens.push({
+              type: 'text',
+              text: p,
               html: escapeHtml(p),
-              endsAtBoundary: /[。！？.!?\n]$/.test(p),
+              endsAtBoundary: /[。！？.!?；;\n]$/.test(p),
             });
           }
         } else if (child.nodeType === Node.ELEMENT_NODE) {
           // 行内格式（<b>/<i>/<span>...）不是断点；
           // 块级子元素（<li>/<p>/<div>/<br>）是天然断点
           const isInline = INLINE_TAGS.has(child.tagName);
-          tokens.push({ html: child.outerHTML, endsAtBoundary: !isInline });
+          tokens.push({ type: 'element', html: child.outerHTML, endsAtBoundary: !isInline });
         }
       }
       return tokens;
     }
 
-    // 贪心地把一个塞不下的块按句号填到当前卡的剩余空间里，
+    // 用二分查找：在 fittedHTML 基础上，往一个文本最多再塞多少字符还能 fit
+    function findMaxCharsFit(block, fittedHTML, text) {
+      let lo = 1, hi = text.length, best = 0;
+      while (lo <= hi) {
+        const mid = (lo + hi) >> 1;
+        const tryEl = block.cloneNode(false);
+        tryEl.innerHTML = fittedHTML + escapeHtml(text.slice(0, mid));
+        if (tryFit(tryEl.outerHTML)) {
+          best = mid;
+          lo = mid + 1;
+        } else {
+          hi = mid - 1;
+        }
+      }
+      // 英文回退：避免切单词中间
+      if (best > 0 && best < text.length) {
+        const left = text[best - 1], right = text[best];
+        if (/[A-Za-z0-9]/.test(left) && /[A-Za-z0-9]/.test(right)) {
+          let p = best;
+          while (p > 0 && /[A-Za-z0-9]/.test(text[p - 1])) p--;
+          if (p > 0) best = p;
+        }
+      }
+      return best;
+    }
+
+    // 贪心地把一个塞不下的块按句号 / 字符填到当前卡的剩余空间里，
     // 返回 { fitted: bool, remainder: HTMLElement | null }
-    // fitted=true 表示「至少有一句被塞进了当前卡」，buffer 已被 push。
+    // fitted=true 表示「至少有一些内容被塞进了当前卡」，buffer 已被 push。
     function greedyPackSentences(block) {
       // 不可拆类型：图片 / 横线 → 让外层走拆块或新开一页
       if (block.tagName === 'IMG' || block.tagName === 'HR') {
@@ -174,11 +202,12 @@ window.CARDS = (function () {
       }
 
       const tokens = tokenizeBlock(block);
-      if (tokens.length <= 1) return { fitted: false, remainder: block };
+      if (tokens.length === 0) return { fitted: false, remainder: block };
 
       let fittedHTML = '';
-      let lastBoundaryHTML = '';
-      let lastBoundaryIdx = -1;
+      let lastCutHTML = '';        // 已 commit 的最近"好切点"
+      let lastCutTokenIdx = -1;    // 该切点对应的 token 索引
+      let charSplitRemainder = ''; // 文本 token 被字符级切开后剩的部分
 
       for (let i = 0; i < tokens.length; i++) {
         const cloneEl = block.cloneNode(false);
@@ -186,30 +215,40 @@ window.CARDS = (function () {
         if (tryFit(cloneEl.outerHTML)) {
           fittedHTML += tokens[i].html;
           if (tokens[i].endsAtBoundary) {
-            lastBoundaryHTML = fittedHTML;
-            lastBoundaryIdx = i;
+            lastCutHTML = fittedHTML;
+            lastCutTokenIdx = i;
+            charSplitRemainder = '';
           }
         } else {
+          // 当前 token 整段塞不下；如果是文本，按字符再榨一榨
+          if (tokens[i].type === 'text' && tokens[i].text.length > 1) {
+            const maxChars = findMaxCharsFit(block, fittedHTML, tokens[i].text);
+            if (maxChars > 0) {
+              fittedHTML += escapeHtml(tokens[i].text.slice(0, maxChars));
+              lastCutHTML = fittedHTML;
+              lastCutTokenIdx = i;
+              charSplitRemainder = tokens[i].text.slice(maxChars);
+            }
+          }
           break;
         }
       }
 
-      if (lastBoundaryIdx < 0) {
-        // 当前卡空间连一句话都装不下 → 让外层处理
+      if (lastCutTokenIdx < 0) {
+        // 连一个字都塞不下 → 让外层处理
         return { fitted: false, remainder: block };
       }
 
-      // 把「到最后一个完整句子为止」推入当前卡
+      // 把可填的部分推入当前卡
       const fittedEl = block.cloneNode(false);
-      fittedEl.innerHTML = lastBoundaryHTML;
+      fittedEl.innerHTML = lastCutHTML;
       buffer.push(fittedEl.outerHTML);
 
-      // 剩下的句子拼成新块，作为 remainder 留给后续卡
-      const remainingTokens = tokens.slice(lastBoundaryIdx + 1);
-      if (remainingTokens.length === 0) {
-        return { fitted: true, remainder: null };
+      // 组装 remainder（字符切剩下的尾巴 + 后续 tokens）
+      let remainderHTML = charSplitRemainder ? escapeHtml(charSplitRemainder) : '';
+      for (let j = lastCutTokenIdx + 1; j < tokens.length; j++) {
+        remainderHTML += tokens[j].html;
       }
-      const remainderHTML = remainingTokens.map(t => t.html).join('');
       if (!remainderHTML.replace(/\s/g, '')) {
         return { fitted: true, remainder: null };
       }
@@ -272,12 +311,39 @@ window.CARDS = (function () {
 
   /**
    * 从编辑器抽出"块"级元素列表
+   * - <ul>/<ol> 会被拆成 N 个单 item 列表，方便分页器逐条打包
+   * - <ol> 拆开时保留 start 序号
+   * - <div> 包含的块级子元素会被提到顶层
    */
+  function flattenList(listEl) {
+    const tag = listEl.tagName; // UL or OL
+    const out = [];
+    let counter = 1;
+    for (const li of Array.from(listEl.children)) {
+      if (li.tagName !== 'LI') continue;
+      const wrapper = document.createElement(tag);
+      // 复制原列表的 class / style 属性，主题样式不丢
+      if (listEl.className) wrapper.className = listEl.className;
+      if (listEl.getAttribute('style')) wrapper.setAttribute('style', listEl.getAttribute('style'));
+      if (tag === 'OL') wrapper.setAttribute('start', String(counter));
+      wrapper.appendChild(li.cloneNode(true));
+      // 标记一下，方便 CSS 让相邻拆出来的列表无缝衔接
+      wrapper.setAttribute('data-li-flat', '1');
+      out.push(wrapper);
+      counter++;
+    }
+    return out.length > 0 ? out : [listEl];
+  }
+
   function extractBlocks(editor) {
     const blocks = [];
     Array.from(editor.childNodes).forEach(n => {
       if (n.nodeType === Node.ELEMENT_NODE) {
         if (n.tagName === 'BR') return;
+        if (n.tagName === 'UL' || n.tagName === 'OL') {
+          flattenList(n).forEach(b => blocks.push(b));
+          return;
+        }
         blocks.push(n);
       } else if (n.nodeType === Node.TEXT_NODE) {
         const text = n.textContent.trim();
