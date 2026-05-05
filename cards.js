@@ -56,6 +56,10 @@ window.CARDS = (function () {
       name: '古籍',
       previewBg: '#ede0c8',
     },
+    editorial: {
+      name: '编辑手记',
+      previewBg: '#f5efe2',
+    },
   };
 
   /**
@@ -72,6 +76,12 @@ window.CARDS = (function () {
     const deco = document.createElement('div');
     deco.className = 'card-deco';
     card.appendChild(deco);
+
+    // 章节号 "01" "02" ...（默认隐藏，仅 editorial 主题显示）
+    const chapterNum = document.createElement('div');
+    chapterNum.className = 'card-chapter-num';
+    chapterNum.textContent = String(pageIndex + 1).padStart(2, '0');
+    card.appendChild(chapterNum);
 
     // 昵称印章
     if (showNickname) {

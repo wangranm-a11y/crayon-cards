@@ -523,6 +523,9 @@ input[type="text"]:focus { border-color: var(--accent); }
 /* 装饰层 */
 .card-deco { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
 
+/* 章节号（默认隐藏，仅 editorial 主题显示） */
+.card-chapter-num { display: none; }
+
 /* 封面专用：标题大字 */
 .card-cover .card-content {
   top: 280px;
@@ -958,6 +961,159 @@ input[type="text"]:focus { border-color: var(--accent); }
   background: #b03020;
 }
 
+/* ==========================================================
+   主题 12：编辑手记
+   • 灵感：「思维方式」系列编辑卡片
+   • 顶部小标签（昵称印章变体）+ 大字章节号 "01" + 衬线大标题 + 引言高亮
+   ========================================================== */
+.card-editorial {
+  background: #f5efe2;
+  color: #3a2f25;
+  font-family: var(--font-serif);
+  font-size: 40px;
+  line-height: 1.78;
+}
+.card-editorial .card-deco::before {
+  /* 与正文等宽的装饰角点（左下） */
+  content: ''; position: absolute; left: 96px; bottom: 156px;
+  width: 28px; height: 1px; background: rgba(160,134,90,0.45);
+}
+
+/* 顶部小字标签 = 昵称印章重新样式化 */
+.card-editorial .card-stamp {
+  top: 130px;
+  left: 96px;
+  background: transparent;
+  color: #a08555;
+  border: none;
+  padding: 0;
+  font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  gap: 12px;
+}
+.card-editorial .card-stamp-dot {
+  width: 8px; height: 8px;
+  background: #a08555;
+}
+.card-editorial .card-stamp-name {
+  letter-spacing: 0.24em;
+}
+
+/* 大字章节号 "01" / "02" / ... */
+.card-editorial .card-chapter-num {
+  display: block;
+  position: absolute;
+  top: 178px;
+  left: 92px;
+  font-family: var(--font-serif);
+  font-size: 138px;
+  font-weight: 700;
+  color: #b8965e;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  z-index: 2;
+}
+
+/* 内容区下移，给上方编号 + 标签留位 */
+.card-editorial .card-content {
+  top: 380px;
+  left: 96px;
+  right: 96px;
+  bottom: 170px;
+}
+.card-editorial .card-content > p {
+  margin: 0 0 26px;
+  font-size: 38px;
+  line-height: 1.78;
+  color: #3a2f25;
+}
+.card-editorial .card-content > p:last-child { margin-bottom: 0; }
+
+/* 标题（封面 / 内嵌） */
+.card-editorial .card-content > h1,
+.card-editorial .card-content > h2,
+.card-editorial .card-content > h3 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 60px;
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+  margin: 0 0 18px;
+  color: #1f1612;
+}
+.card-editorial .card-content > h1.cover-title-inline {
+  font-size: 64px;
+  font-weight: 800;
+  margin: 0 0 16px;
+  color: #1f1612;
+}
+.card-editorial .card-content > h1.cover-title-inline::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 3px;
+  background: #a08555;
+  margin-top: 22px;
+  border-radius: 0;
+}
+
+/* 引言：图中底部那个高亮引用框 */
+.card-editorial .card-content > blockquote {
+  margin: 28px 0 0;
+  padding: 24px 28px;
+  background: rgba(184,150,94,0.14);
+  border-left: 4px solid #a08555;
+  border-radius: 0;
+  font-style: normal;
+  font-size: 34px;
+  line-height: 1.65;
+  color: #3a2f25;
+  font-family: var(--font-serif);
+  opacity: 1;
+}
+
+.card-editorial .card-content > ul,
+.card-editorial .card-content > ol {
+  margin: 0 0 22px;
+}
+.card-editorial .card-content > ul li,
+.card-editorial .card-content > ol li {
+  margin-bottom: 12px;
+}
+
+/* 页码：右下角小字（数量 ≥ 2 才显示，沿用主程序逻辑） */
+.card-editorial .card-page {
+  color: rgba(160,134,90,0.78);
+  font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+
+/* 缩略图 */
+.theme-editorial {
+  background: #f5efe2;
+  position: relative;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.theme-editorial::before {
+  content: '01';
+  position: absolute; left: 6px; top: 14px;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: #b8965e;
+  line-height: 1;
+}
+.theme-editorial::after {
+  content: '';
+  position: absolute; left: 8px; top: 40px;
+  width: 36px; height: 2px; border-radius: 1px;
+  background: rgba(58,47,37,0.55);
+  box-shadow: 0 6px 0 rgba(58,47,37,0.55), 0 12px 0 rgba(58,47,37,0.55), 0 18px 0 rgba(58,47,37,0.40);
+}
+
 /* —— 富文本内 inline 元素全部生效 —— */
 .card-content strong, .card-content b { font-weight: 700; }
 .card-content em, .card-content i { font-style: italic; }
@@ -996,6 +1152,7 @@ input[type="text"]:focus { border-color: var(--accent); }
 .card-lavender { --card-accent: #a98be0; }
 .card-neon { --card-accent: #ff4d8d; }
 .card-classical { --card-accent: #b03020; }
+.card-editorial { --card-accent: #a08555; }
 
 /* 杂志主题：标题极重，黑底色 */
 .card-magazine .card-content > h1.cover-title-inline {
