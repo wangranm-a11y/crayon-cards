@@ -14,6 +14,8 @@
     title: '',
     nickname: localStorage.getItem('cc.nickname') || '蜡笔不拿笔',
     theme: localStorage.getItem('cc.theme') || 'cream',
+    font: localStorage.getItem('cc.font') || 'default',
+    tag: localStorage.getItem('cc.tag') || '',
     showPage: true,
     showNickname: true,
     autoCover: true,
@@ -25,6 +27,7 @@
   const editor = $('#editor');
   const toolbar = $('#toolbar');
   const titleEl = $('#titleInput');
+  const tagEl = $('#tagInput');
   const nickEl = $('#nicknameInput');
   const colorIcon = $('#colorIcon');
   const colorInput = $('#textColor');
@@ -35,11 +38,27 @@
 
   // ============ Init ============
   nickEl.value = state.nickname;
+  if (tagEl) tagEl.value = state.tag;
   showPageEl.checked = true;
   showNickEl.checked = true;
   autoCoverEl.checked = true;
   colorInput.value = state.color;
   colorIcon.style.color = state.color;
+
+  // Font picker
+  const fontWrap = $('#fontPicker');
+  if (fontWrap) {
+    fontWrap.querySelectorAll('.font-btn').forEach(b => {
+      if (b.dataset.font === state.font) b.classList.add('active');
+      b.addEventListener('click', () => {
+        fontWrap.querySelectorAll('.font-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        state.font = b.dataset.font;
+        localStorage.setItem('cc.font', state.font);
+        if (!$('#previewView').hidden) regenerate();
+      });
+    });
+  }
 
   // 渲染主题选项
   const themeWrap = $('#themePicker');
@@ -231,6 +250,12 @@
 
   // ============ Title / Nickname / settings ============
   titleEl.addEventListener('input', () => state.title = titleEl.value);
+  if (tagEl) {
+    tagEl.addEventListener('input', () => {
+      state.tag = tagEl.value;
+      localStorage.setItem('cc.tag', state.tag);
+    });
+  }
   nickEl.addEventListener('input', () => {
     state.nickname = nickEl.value || '蜡笔不拿笔';
     localStorage.setItem('cc.nickname', state.nickname);
@@ -313,6 +338,8 @@
       nickname: state.nickname,
       showPage: state.showPage,
       showNickname: state.showNickname,
+      tag: state.tag,
+      font: state.font,
     };
 
     // 1. 准备拆页输入（如果有标题，把它作为大字 H1 加在最前面，

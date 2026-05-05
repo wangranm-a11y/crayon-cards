@@ -67,9 +67,16 @@ window.CARDS = (function () {
    * @returns {HTMLElement} 卡片元素
    */
   function makeCardEl(themeKey, opts = {}) {
-    const { nickname = '蜡笔不拿笔', pageIndex = 0, totalPages = 1, showPage = true, showNickname = true } = opts;
+    const {
+      nickname = '蜡笔不拿笔',
+      pageIndex = 0, totalPages = 1,
+      showPage = true, showNickname = true,
+      tag = '', font = 'default',
+    } = opts;
     const card = document.createElement('div');
-    card.className = `card card-${themeKey}`;
+    let cls = `card card-${themeKey}`;
+    if (font && font !== 'default') cls += ` card-font-${font}`;
+    card.className = cls;
     card.setAttribute('data-theme', themeKey);
 
     // 装饰层（顶/底装饰线、星点）
@@ -95,6 +102,15 @@ window.CARDS = (function () {
     const content = document.createElement('div');
     content.className = 'card-content';
     card.appendChild(content);
+
+    // 标签 pill（每张卡左下角，可选）
+    if (tag) {
+      const tagEl = document.createElement('div');
+      tagEl.className = 'card-tag';
+      const t = String(tag).trim().replace(/^#\s*/, '');
+      tagEl.textContent = `# ${t}`;
+      card.appendChild(tagEl);
+    }
 
     // 页码
     if (showPage && totalPages > 1) {

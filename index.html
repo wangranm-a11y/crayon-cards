@@ -16,7 +16,10 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon-192.svg" />
-  <link rel="stylesheet" href="styles.css?v=9" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=10" />
 
   <!-- html2canvas: DOM → PNG -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -44,6 +47,12 @@
       <label class="field">
         <span class="field-label">标题（可选 · 第 1 张大字封面）</span>
         <input type="text" id="titleInput" placeholder="比如：今天的小确幸" maxlength="36" />
+      </label>
+
+      <!-- 标签 -->
+      <label class="field">
+        <span class="field-label">标签（可选 · 每张卡左下角显示）</span>
+        <input type="text" id="tagInput" placeholder="比如：思维方式 / 读书笔记" maxlength="14" />
       </label>
 
       <!-- 富文本编辑器 -->
@@ -90,6 +99,17 @@
       <div class="field">
         <span class="field-label">挑个主题</span>
         <div class="theme-picker" id="themePicker"></div>
+      </div>
+
+      <!-- 字体 -->
+      <div class="field">
+        <span class="field-label">字体</span>
+        <div class="font-picker" id="fontPicker">
+          <button type="button" class="font-btn" data-font="default">主题默认</button>
+          <button type="button" class="font-btn" data-font="serif" style="font-family:var(--font-serif);font-weight:700;">宋体</button>
+          <button type="button" class="font-btn" data-font="sans" style="font-family:var(--font-sans);">黑体</button>
+          <button type="button" class="font-btn" data-font="handwrite" style="font-family:'Ma Shan Zheng','STKaiti','KaiTi',cursive;">行楷</button>
+        </div>
       </div>
 
       <!-- 高级 -->
@@ -141,8 +161,8 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="cards.js?v=9"></script>
-  <script src="app.js?v=9"></script>
+  <script src="cards.js?v=10"></script>
+  <script src="app.js?v=10"></script>
 
   <script>
     if ('serviceWorker' in navigator) {
