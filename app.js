@@ -129,16 +129,168 @@
     });
   });
 
-  // 颜色选择
-  colorInput.addEventListener('input', e => {
-    state.color = e.target.value;
-    colorIcon.style.color = state.color;
-    localStorage.setItem('cc.color', state.color);
+  // ============ 单段染色 popover ============
+  const rtColorBtn = $('#rtColorBtn');
+  const rtColorPopover = $('#rtColorPopover');
+  const rtColorCustom = rtColorPopover ? rtColorPopover.querySelector('.rt-cp-custom') : null;
+
+  function positionColorPopover() {
+    const rect = rtColorBtn.getBoundingClientRect();
+    rtColorPopover.style.top = `${rect.bottom + 6}px`;
+    let left = rect.left;
+    // 防止溢出右侧
+    const pw = rtColorPopover.offsetWidth || 320;
+    const maxLeft = document.documentElement.clientWidth - pw - 8;
+    if (left > maxLeft) left = Math.max(8, maxLeft);
+    rtColorPopover.style.left = `${left}px`;
+  }
+  function closeColorPopover() {
+    if (!rtColorPopover) return;
+    rtColorPopover.hidden = true;
+    rtColorBtn.classList.remove('active');
+  }
+  function applyTextColor(color) {
     editor.focus();
-    try { document.execCommand('foreColor', false, state.color); } catch (err) {}
-  });
-  // 点颜色块也激活（避免要先选文字）
-  $('.rt-color-wrap').addEventListener('mousedown', e => e.preventDefault());
+    try {
+      if (color === 'default') {
+        // 清掉选中文字的颜色（用 inherit 让父元素颜色透出）
+        document.execCommand('styleWithCSS', false, true);
+        document.execCommand('foreColor', false, 'inherit');
+      } else {
+        document.execCommand('styleWithCSS', false, true);
+        document.execCommand('foreColor', false, color);
+        state.color = color;
+        colorIcon.style.color = color;
+        if (colorInput) colorInput.value = color;
+        localStorage.setItem('cc.color', state.color);
+      }
+    } catch (err) {}
+    closeColorPopover();
+  }
+  if (rtColorBtn && rtColorPopover) {
+    rtColorBtn.addEventListener('mousedown', e => e.preventDefault());
+    rtColorBtn.addEventListener('click', () => {
+      const willShow = rtColorPopover.hidden;
+      rtColorPopover.hidden = !willShow;
+      rtColorBtn.classList.toggle('active', willShow);
+      if (willShow) positionColorPopover();
+    });
+    rtColorPopover.querySelectorAll('.rt-cp-swatch, .rt-cp-default').forEach(b => {
+      b.addEventListener('mousedown', e => e.preventDefault());
+      b.addEventListener('click', () => applyTextColor(b.dataset.color));
+    });
+    if (rtColorCustom) rtColorCustom.addEventListener('mousedown', e => e.preventDefault());
+    if (colorInput) colorInput.addEventListener('input', e => applyTextColor(e.target.value));
+    document.addEventListener('mousedown', e => {
+      if (!rtColorBtn.contains(e.target) && !rtColorPopover.contains(e.target)) {
+        closeColorPopover();
+      }
+    });
+    window.addEventListener('scroll', () => { if (!rtColorPopover.hidden) positionColorPopover(); }, { passive: true });
+    window.addEventListener('resize', () => { if (!rtColorPopover.hidden) positionColorPopover(); });
+  }
+
+  // ============ 图片选中 + 浮动工具栏 ============
+  const imgToolbar = $('#imageToolbar');
+  let selectedImg = null;
+
+  function getEditorBlock(node) {
+    let cur = node;
+    while (cur && cur.parentNode !== editor) {
+      cur = cur.parentNode;
+      if (!cur || !editor.contains(cur)) return null;
+    }
+    return cur;
+  }
+  function positionImgToolbar(img) {
+    const rect = img.getBoundingClientRect();
+    const tbH = imgToolbar.offsetHeight || 40;
+    const margin = 6;
+    let top = rect.top - tbH - margin;
+    if (top < 8) top = rect.bottom + margin;
+    let left = rect.left;
+    const tbW = imgToolbar.offsetWidth || 200;
+    const maxLeft = document.documentElement.clientWidth - tbW - 8;
+    if (left > maxLeft) left = Math.max(8, maxLeft);
+    imgToolbar.style.top = `${top}px`;
+    imgToolbar.style.left = `${left}px`;
+  }
+  function selectImageEl(img) {
+    editor.querySelectorAll('img.cc-selected').forEach(x => x.classList.remove('cc-selected'));
+    img.classList.add('cc-selected');
+    selectedImg = img;
+    imgToolbar.hidden = false;
+    positionImgToolbar(img);
+  }
+  function deselectImageEl() {
+    if (!selectedImg) return;
+    editor.querySelectorAll('img.cc-selected').forEach(x => x.classList.remove('cc-selected'));
+    selectedImg = null;
+    imgToolbar.hidden = true;
+  }
+
+  if (imgToolbar) {
+    editor.addEventListener('click', e => {
+      if (e.target.tagName === 'IMG') selectImageEl(e.target);
+      else deselectImageEl();
+    });
+    document.addEventListener('mousedown', e => {
+      if (!editor.contains(e.target) && !imgToolbar.contains(e.target)) deselectImageEl();
+    });
+    window.addEventListener('scroll', () => { if (selectedImg) positionImgToolbar(selectedImg); }, { passive: true });
+    window.addEventListener('resize', () => { if (selectedImg) positionImgToolbar(selectedImg); });
+
+    imgToolbar.querySelectorAll('.img-tb-btn').forEach(btn => {
+      btn.addEventListener('mousedown', e => e.preventDefault());
+      btn.addEventListener('click', () => {
+        if (!selectedImg) return;
+        const act = btn.dataset.act;
+        const img = selectedImg;
+        const block = getEditorBlock(img);
+        if (!block) return;
+
+        const others = Array.from(block.childNodes).filter(n => n !== img);
+        const blockHasOther = others.some(n =>
+          (n.nodeType === Node.TEXT_NODE && n.textContent.trim()) ||
+          (n.nodeType === Node.ELEMENT_NODE && n.tagName !== 'BR')
+        );
+
+        switch (act) {
+          case 'up': {
+            const prev = block.previousElementSibling;
+            if (prev) editor.insertBefore(block, prev);
+            break;
+          }
+          case 'down': {
+            const next = block.nextElementSibling;
+            if (next) editor.insertBefore(next, block);
+            break;
+          }
+          case 'duplicate': {
+            if (!blockHasOther) {
+              const clone = block.cloneNode(true);
+              clone.querySelectorAll('img.cc-selected').forEach(x => x.classList.remove('cc-selected'));
+              block.parentNode.insertBefore(clone, block.nextSibling);
+            } else {
+              const imgClone = img.cloneNode(true);
+              imgClone.classList.remove('cc-selected');
+              img.parentNode.insertBefore(imgClone, img.nextSibling);
+            }
+            break;
+          }
+          case 'delete': {
+            if (!blockHasOther && block !== editor) block.remove();
+            else img.remove();
+            deselectImageEl();
+            updateCharCount();
+            return;
+          }
+        }
+        positionImgToolbar(img);
+        updateCharCount();
+      });
+    });
+  }
 
   // 插图按钮
   $('#insertImage').addEventListener('mousedown', e => e.preventDefault());
@@ -359,6 +511,8 @@
 
   // ============ Render ============
   async function regenerate() {
+    deselectImageEl();
+    closeColorPopover();
     const list = $('#cardsList');
     list.innerHTML = '<p style="text-align:center;color:#a89e8a;font-style:italic;">正在拼版…</p>';
     state.cards = [];

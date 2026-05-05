@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=12" />
+  <link rel="stylesheet" href="styles.css?v=13" />
 
   <!-- html2canvas: DOM → PNG -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -67,10 +67,26 @@
             <button type="button" class="rt-btn underline" data-cmd="underline" title="下划线 (⌘U)">U</button>
             <span class="rt-divider"></span>
 
-            <label class="rt-color-wrap" title="单段染色：先选中要染色的文字，再点这里挑色">
-              <span class="rt-color-icon" id="colorIcon" style="color:#c84b31;"></span>
-              <input type="color" id="textColor" value="#c84b31" />
-            </label>
+            <div class="rt-color-popover-wrap">
+              <button type="button" class="rt-btn rt-color-btn" id="rtColorBtn" title="单段染色 · 选中文字后点这里">
+                <span class="rt-color-icon" id="colorIcon" style="color:#c84b31;"></span>
+              </button>
+              <div class="rt-color-popover" id="rtColorPopover" hidden>
+                <button type="button" class="rt-cp-default" data-color="default">原色</button>
+                <span class="rt-cp-divider"></span>
+                <button type="button" class="rt-cp-swatch" data-color="#c84b31" style="background:#c84b31" title="胭脂"></button>
+                <button type="button" class="rt-cp-swatch" data-color="#5d3f25" style="background:#5d3f25" title="暖棕"></button>
+                <button type="button" class="rt-cp-swatch" data-color="#1a1410" style="background:#1a1410" title="深黑"></button>
+                <button type="button" class="rt-cp-swatch" data-color="#2c5f3f" style="background:#2c5f3f" title="墨绿"></button>
+                <button type="button" class="rt-cp-swatch" data-color="#1e3a5f" style="background:#1e3a5f" title="藏蓝"></button>
+                <button type="button" class="rt-cp-swatch" data-color="#6b1f2a" style="background:#6b1f2a" title="暗红"></button>
+                <button type="button" class="rt-cp-swatch" data-color="#a98be0" style="background:#a98be0" title="淡紫"></button>
+                <label class="rt-cp-custom" title="自定义颜色">
+                  <span class="rt-cp-custom-icon">+</span>
+                  <input type="color" id="textColor" value="#c84b31" />
+                </label>
+              </div>
+            </div>
 
             <button type="button" class="rt-btn" id="insertImage" title="插入图片">📷</button>
 
@@ -179,8 +195,17 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="cards.js?v=12"></script>
-  <script src="app.js?v=12"></script>
+  <!-- 图片浮动工具栏（点击编辑器里的图片后出现） -->
+  <div id="imageToolbar" class="img-toolbar" hidden>
+    <button type="button" class="img-tb-btn" data-act="up" title="上移">↑</button>
+    <button type="button" class="img-tb-btn" data-act="down" title="下移">↓</button>
+    <span class="img-tb-divider"></span>
+    <button type="button" class="img-tb-btn" data-act="duplicate" title="复制一份">⧉</button>
+    <button type="button" class="img-tb-btn" data-act="delete" title="删除">×</button>
+  </div>
+
+  <script src="cards.js?v=13"></script>
+  <script src="app.js?v=13"></script>
 
   <script>
     if ('serviceWorker' in navigator) {
