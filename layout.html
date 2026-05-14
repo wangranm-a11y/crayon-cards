@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>蜡笔不拿笔 · 小红书排版</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Bodoni:ital,wght@0,400;0,500;1,400&family=Noto+Serif+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    /* ═══════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════ */
+    :root {
+      --bg:           #07070e;
+      --surface:      #0c0c18;
+      --surface-2:    #101020;
+      --border:       rgba(255,255,255,0.055);
+      --border-hi:    rgba(255,255,255,0.10);
+
+      --text:         #e4dcf5;
+      --text-muted:   #6a5f8a;
+      --text-dim:     #342d4a;
+
+      --accent:       #7c3aed;
+      --accent-hi:    #9333ea;
+      --accent-lo:    #c084fc;
+      --glow:         rgba(124,58,237,0.18);
+      --glow-hi:      rgba(124,58,237,0.32);
+
+      --ease-out: cubic-bezier(0.16,1,0.3,1);
+      --ease-in:  cubic-bezier(0.7,0,0.84,0);
+      --t-fast:   140ms;
+      --t-mid:    240ms;
+      --t-slow:   400ms;
+    }
+
+    /* ═══════════════════════════════════════
+       RESET
+    ═══════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: 'Noto Serif SC', '汇文明朝体', 'Source Han Serif SC', serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ═══════════════════════════════════════
+       APP SHELL
+    ═══════════════════════════════════════ */
+    .app { display: flex; flex-direction: column; height: 100vh; }
+
+    /* ═══════════════════════════════════════
+       HEADER
+    ═══════════════════════════════════════ */
+    .header {
+      height: 50px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7,7,14,0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      z-index: 20;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 12px; }
+
+    .brand {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      color: var(--accent-lo);
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 14px;
+      background: var(--border-hi);
+    }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+    }
+
+    .header-badge {
+      font-size: 10px;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 10px;
+      letter-spacing: 0.06em;
+    }
+
+    /* ═══════════════════════════════════════
+       WORKSPACE
+    ═══════════════════════════════════════ */
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 358px 1fr;
+      min-height: 0;
+    }
+
+    /* ═══════════════════════════════════════
+       EDITOR
+    ═══════════════════════════════════════ */
+    .editor {
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-hi) transparent;
+    }
+    .editor::-webkit-scrollbar { width: 3px; }
+    .editor::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+    .section {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sec-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .sec-label {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .sec-rule {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Textarea */
+    .textarea {
+      width: 100%;
+      min-height: 190px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 13px 14px;
+      color: var(--text);
+      font-family: 'Noto Serif SC', '汇文明朝体', serif;
+      font-size: 13.5px;
+      line-height: 1.85;
+      resize: vertical;
+      outline: none;
+      transition:
+        border-color var(--t-fast) ease,
+        box-shadow var(--t-fast) ease;
+    }
+    .textarea::placeholder { color: var(--text-dim); }
+    .textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+    .char-count {
+      margin-top: 7px;
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: right;
+    }
+
+    /* Field */
+    .field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .field:last-child { margin-bottom: 0; }
+    .field-lbl {
+      width: 46px;
+      flex-shrink: 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .field-input {
+      flex: 1;
+      height: 32px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+      transition: border-color var(--t-fast) ease;
+    }
+    .field-input:focus { border-color: var(--accent); }
+    .field-input::placeholder { color: var(--text-dim); }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .toggle-row:last-child { margin-bottom: 0; }
+    .toggle-lbl { font-size: 12px; color: var(--text-muted); }
+
+    .toggle { position: relative; display: inline-block; width: 34px; height: 18px; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 9px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-hi);
+      cursor: pointer;
+      transition:
+        background var(--t-fast) ease,
+        border-color var(--t-fast) ease;
+    }
+    .toggle-thumb {
+      position: absolute;
+      width: 12px; height: 12px;
+      top: 2px; left: 2px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition:
+        transform var(--t-fast) var(--ease-out),
+        background var(--t-fast) ease;
+    }
+    .toggle input:checked ~ .toggle-track { background: var(--accent); border-color: var(--accent); }
+    .toggle input:checked ~ .toggle-track .toggle-thumb { transform: translateX(16px); background: #fff; }
+
+    /* Slider */
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .slider-lbl { width: 46px; font-size: 12px; color: var(--text-muted); }
+    .slider {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--border-hi);
+      outline: none;
+      cursor: pointer;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      background: var(--accent-lo);
+      cursor: pointer;
+      transition: transform var(--t-fast) ease;
+    }
+    .slider::-webkit-slider-thumb:hover { transform: scale(1.25); }
+    .slider-val { width: 26px; text-align: right; font-size: 12px; color: var(--text-muted); }
+
+    /* Theme swatches */
+    .theme-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 7px; }
+    .theme-item { cursor: pointer; }
+    .theme-swatch {
+      aspect-ratio: 3/4;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      overflow: hidden;
+      transition:
+        border-color var(--t-fast) ease,
+        transform var(--t-fast) var(--ease-out);
+    }
+    .theme-swatch:hover { transform: scale(1.07); }
+    .theme-swatch.active { border-color: var(--accent-lo); }
+    .swatch-body { width: 100%; height: 100%; padding: 6px 5px; display: flex; flex-direction: column; gap: 3px; }
+    .swatch-nick { height: 2px; border-radius: 1px; opacity: 0.55; width: 55%; }
+    .swatch-lines { display: flex; flex-direction: column; gap: 2px; flex: 1; margin-top: 3px; }
+    .swatch-line { height: 2px; border-radius: 1px; }
+    .theme-name { text-align: center; font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Generate btn */
+    .btn-gen {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      box-shadow: 0 4px 22px var(--glow);
+      transition:
+        transform var(--t-fast) var(--ease-out),
+        box-shadow var(--t-fast) ease;
+    }
+    .btn-gen:hover { transform: translateY(-2px); box-shadow: 0 6px 28px var(--glow-hi); }
+    .btn-gen:active { transform: translateY(0); }
+
+    /* ═══════════════════════════════════════
+       PREVIEW
+    ═══════════════════════════════════════ */
+    .preview {
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      gap: 22px;
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse at 50% -10%, rgba(124,58,237,0.09) 0%, transparent 58%),
+        radial-gradient(circle at 1px 1px, rgba(255,255,255,0.013) 1px, transparent 0);
+      background-size: 100% 100%, 26px 26px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-hi) transparent;
+    }
+    .preview::-webkit-scrollbar { width: 3px; }
+    .preview::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+    /* Empty state */
+    .empty {
+      text-align: center;
+      animation: fadeUp var(--t-slow) var(--ease-out);
+    }
+    .empty-glyph {
+      display: block;
+      font-family: 'Libre Bodoni', serif;
+      font-style: italic;
+      font-size: 52px;
+      color: var(--text-dim);
+      margin-bottom: 18px;
+      line-height: 1;
+    }
+    .empty-txt { font-size: 13px; color: var(--text-dim); letter-spacing: 0.12em; }
+
+    /* Card display */
+    .card-wrap {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .card-wrap.on {
+      display: flex;
+      animation: fadeUp var(--t-slow) var(--ease-out);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════════════════════════════════
+       THE CARD  (3:4 = 360×480)
+    ═══════════════════════════════════════ */
+    .card {
+      width: 360px;
+      height: 480px;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.045),
+        0 8px 30px rgba(0,0,0,0.55),
+        0 22px 60px rgba(0,0,0,0.38);
+      transition:
+        opacity var(--t-mid) ease,
+        box-shadow var(--t-mid) ease;
+    }
+    .card.fading { opacity: 0; }
+
+    .card-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 30px 28px 24px;
+      font-family: '汇文明朝体', 'HuiWen MingTi', 'Noto Serif SC', 'Source Han Serif SC', serif;
+    }
+
+    /* Stamp row */
+    .c-stamp {
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      opacity: 0.68;
+      flex-shrink: 0;
+      margin-bottom: 5px;
+    }
+    .c-rule {
+      height: 1px;
+      flex-shrink: 0;
+      margin-bottom: 18px;
+      opacity: 0.14;
+    }
+
+    /* Body */
+    .c-body {
+      flex: 1;
+      overflow: hidden;
+      word-break: break-all;
+    }
+    .c-para { line-height: 1.95; letter-spacing: 0.055em; margin-bottom: 1em; }
+    .c-para:last-child { margin-bottom: 0; }
+
+    /* Cover */
+    .c-cover-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .c-cover-title {
+      font-weight: 500;
+      line-height: 1.5;
+      letter-spacing: 0.04em;
+      margin-bottom: 14px;
+    }
+    .c-cover-dash { font-size: 18px; opacity: 0.38; }
+
+    /* Footer */
+    .c-foot {
+      flex-shrink: 0;
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .c-tags { font-size: 10px; letter-spacing: 0.06em; opacity: 0.48; max-width: 64%; line-height: 1.6; }
+    .c-page { font-size: 10px; letter-spacing: 0.18em; opacity: 0.28; }
+
+    /* ═══════════════════════════════════════
+       NAV + ACTIONS
+    ═══════════════════════════════════════ */
+    .nav { display: flex; align-items: center; gap: 14px; }
+
+    .nav-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border-hi);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 17px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition:
+        border-color var(--t-fast) ease,
+        color var(--t-fast) ease,
+        background var(--t-fast) ease;
+    }
+    .nav-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent-lo);
+      background: var(--glow);
+    }
+    .nav-btn:disabled { opacity: 0.22; cursor: not-allowed; }
+    .nav-count { font-size: 12px; color: var(--text-muted); letter-spacing: 0.12em; min-width: 48px; text-align: center; }
+
+    .actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 8px 15px;
+      border-radius: 8px;
+      border: 1px solid var(--border-hi);
+      background: var(--surface);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: all var(--t-fast) ease;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent-lo); background: var(--glow); }
+    .btn.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn.pri:hover { background: var(--accent-hi); border-color: var(--accent-hi); }
+
+    /* Thumbnails */
+    .thumbs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 500px; }
+    .thumb {
+      width: 40px; height: 54px;
+      border-radius: 3px;
+      border: 2px solid transparent;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color var(--t-fast) ease, transform var(--t-fast) var(--ease-out);
+    }
+    .thumb:hover { transform: scale(1.12); }
+    .thumb.active { border-color: var(--accent-lo); }
+    .thumb-n { font-size: 11px; font-weight: 500; }
+
+    /* ═══════════════════════════════════════
+       OVERLAY + TOAST
+    ═══════════════════════════════════════ */
+    .overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(7,7,14,0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+    }
+    .overlay.on { display: flex; }
+    .spinner {
+      width: 26px; height: 26px;
+      border: 2px solid var(--border-hi);
+      border-top-color: var(--accent-lo);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .overlay-txt { font-size: 13px; color: var(--text-muted); letter-spacing: 0.1em; }
+
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--surface-2);
+      border: 1px solid var(--border-hi);
+      color: var(--text);
+      padding: 9px 20px;
+      border-radius: 24px;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      transition: opacity var(--t-mid) ease, transform var(--t-mid) var(--ease-out);
+      pointer-events: none;
+      z-index: 200;
+      white-space: nowrap;
+    }
+    .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+  <!-- ── HEADER ─────────────────────────────── -->
+  <header class="header">
+    <div class="header-left">
+      <span class="brand">蜡笔不拿笔</span>
+      <div class="header-divider"></div>
+      <span class="header-sub">小红书排版</span>
+    </div>
+    <span class="header-badge">3:4 · 本地生成 · 无需上传</span>
+  </header>
+
+  <!-- ── WORKSPACE ──────────────────────────── -->
+  <div class="workspace">
+
+    <!-- EDITOR ─────────────────────────────── -->
+    <aside class="editor">
+
+      <!-- 正文 -->
+      <div class="section">
+        <div class="sec-head">
+          <span class="sec-label">正文</span>
+          <div class="sec-rule"></div>
+        </div>
+        <textarea id="content" class="textarea"
+          placeholder="在这里输入你的文字&#10;&#10;段落之间空一行&#10;程序会自动分配到多张卡片"
+          oninput="onInput(this)"></textarea>
+        <div class="char-count"><span id="char-n">0</span> 字</div>
+      </div>
+
+      <!-- 设置 -->
+      <div class="section">
+        <div class="sec-head">
+          <span class="sec-label">设置</span>
+          <div class="sec-rule"></div>
+        </div>
+
+        <div class="field">
+          <span class="field-lbl">昵称</span>
+          <input type="text" class="field-input" id="nickname" value="蜡笔不拿笔" placeholder="昵称">
+        </div>
+
+        <div class="field">
+          <span class="field-lbl">标签</span>
+          <input type="text" class="field-input" id="tags" placeholder="#小红书 #分享">
+        </div>
+
+        <div class="toggle-row">
+          <span class="toggle-lbl">封面标题</span>
+          <label class="toggle">
+            <input type="checkbox" id="use-title" onchange="toggleTitle()">
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="field" id="title-field" style="display:none">
+          <span class="field-lbl">标题</span>
+          <input type="text" class="field-input" id="title" placeholder="封面文字">
+        </div>
+
+        <div class="toggle-row">
+          <span class="toggle-lbl">显示页码</span>
+          <label class="toggle">
+            <input type="checkbox" id="use-page" checked>
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="slider-row">
+          <span class="slider-lbl">字号</span>
+          <input type="range" class="slider" id="font-sz" min="13" max="19" value="15"
+            oninput="document.getElementById('fs-val').textContent=this.value">
+          <span class="slider-val" id="fs-val">15</span>
+        </div>
+      </div>
+
+      <!-- 主题 -->
+      <div class="section">
+        <div class="sec-head">
+          <span class="sec-label">主题</span>
+          <div class="sec-rule"></div>
+        </div>
+        <div class="theme-grid" id="theme-grid"></div>
+      </div>
+
+      <!-- 生成 -->
+      <div class="section">
+        <button class="btn-gen" onclick="generate()">生成卡片</button>
+      </div>
+
+    </aside>
+
+    <!-- PREVIEW ─────────────────────────────── -->
+    <main class="preview">
+
+      <div class="empty" id="empty">
+        <span class="empty-glyph">✦</span>
+        <div class="empty-txt">输入文字，点击生成卡片</div>
+      </div>
+
+      <div class="card-wrap" id="card-wrap">
+
+        <div class="card" id="main-card">
+          <div class="card-inner" id="card-inner"></div>
+        </div>
+
+        <div class="nav">
+          <button class="nav-btn" id="prev-btn" onclick="navTo(curIdx-1)" disabled>‹</button>
+          <span class="nav-count" id="nav-count">1 / 1</span>
+          <button class="nav-btn" id="next-btn" onclick="navTo(curIdx+1)" disabled>›</button>
+        </div>
+
+        <div class="actions">
+          <button class="btn" onclick="dlCurrent()">下载此张</button>
+          <button class="btn" onclick="dlAll()">下载全部</button>
+          <button class="btn pri" onclick="generate()">重新生成</button>
+        </div>
+
+        <div class="thumbs" id="thumbs"></div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
+  <div class="overlay-txt" id="overlay-txt">生成中…</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+
+<script>
+/* ════════════════════════════════════════
+   THEMES
+════════════════════════════════════════ */
+const THEMES = {
+  night: { name:'夜墨',  bg:'#08080f', fg:'#c084fc', stamp:'#9333ea', lineOp:0.15 },
+  gold:  { name:'暗金',  bg:'#0c0801', fg:'#d4a843', stamp:'#a87c2a', lineOp:0.12 },
+  frost: { name:'霜白',  bg:'#fafafa', fg:'#1a1523', stamp:'#7060a0', lineOp:0.10 },
+  mist:  { name:'雾霭',  bg:'#f3ede2', fg:'#2c1e0c', stamp:'#8b6040', lineOp:0.12 },
+  jade:  { name:'碧墨',  bg:'#02100a', fg:'#6ee7b7', stamp:'#059669', lineOp:0.12 },
+};
+
+let theme = 'night';
+let cards = [];
+let curIdx = 0;
+
+/* ════════════════════════════════════════
+   BUILD SWATCHES
+════════════════════════════════════════ */
+function buildThemes() {
+  const g = document.getElementById('theme-grid');
+  g.innerHTML = '';
+  for (const [k, t] of Object.entries(THEMES)) {
+    const el = document.createElement('div');
+    el.className = 'theme-item';
+    el.innerHTML = `
+      <div class="theme-swatch${k===theme?' active':''}" data-k="${k}"
+           style="background:${t.bg}" onclick="pickTheme('${k}')">
+        <div class="swatch-body">
+          <div class="swatch-nick" style="background:${t.stamp}"></div>
+          <div class="swatch-lines">
+            <div class="swatch-line" style="background:${t.fg};width:100%"></div>
+            <div class="swatch-line" style="background:${t.fg};width:78%"></div>
+            <div class="swatch-line" style="background:${t.fg};width:88%"></div>
+            <div class="swatch-line" style="background:${t.fg};width:62%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="theme-name">${t.name}</div>`;
+    g.appendChild(el);
+  }
+}
+
+function pickTheme(k) {
+  theme = k;
+  document.querySelectorAll('.theme-swatch').forEach(el =>
+    el.classList.toggle('active', el.dataset.k === k));
+  if (cards.length) { renderCard(curIdx); buildThumbs(); }
+}
+
+/* ════════════════════════════════════════
+   TEXT SPLITTING
+════════════════════════════════════════ */
+function split(text, fs) {
+  const W = 304, H = 370; // inner card area (px)
+  const perLine = Math.floor(W / (fs * 1.05));
+  const lines   = Math.floor(H / (fs * 1.95));
+  const cap     = Math.floor(perLine * lines * 0.90);
+
+  const paras = text.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
+  const out = [];
+  let bucket = [], bLen = 0;
+
+  for (const p of paras) {
+    const add = (bucket.length ? 2 : 0) + p.length;
+
+    if (bLen + add > cap && bucket.length) {
+      out.push({ type:'text', paras:[...bucket] });
+      bucket = []; bLen = 0;
+    }
+
+    if (p.length > cap) {
+      if (bucket.length) { out.push({ type:'text', paras:[...bucket] }); bucket = []; bLen = 0; }
+      splitLong(p, cap).forEach(c => out.push({ type:'text', paras:[c] }));
+    } else {
+      bucket.push(p);
+      bLen += add;
+    }
+  }
+  if (bucket.length) out.push({ type:'text', paras:[...bucket] });
+  return out.length ? out : [{ type:'text', paras:[''] }];
+}
+
+function splitLong(text, cap) {
+  const parts = text.split(/(?<=[。！？…!?.]+)/);
+  const chunks = []; let cur = '';
+  for (const p of parts) {
+    if ((cur+p).length <= cap) cur += p;
+    else { if (cur) chunks.push(cur.trim()); cur = p; }
+  }
+  if (cur.trim()) chunks.push(cur.trim());
+  // Hard break oversized
+  const out = [];
+  for (const c of chunks) {
+    if (c.length <= cap) out.push(c);
+    else for (let i=0; i<c.length; i+=cap) out.push(c.slice(i, i+cap));
+  }
+  return out;
+}
+
+/* ════════════════════════════════════════
+   GENERATE
+════════════════════════════════════════ */
+function generate() {
+  const raw = document.getElementById('content').value.trim();
+  if (!raw) { toast('请先输入文字'); return; }
+
+  const fs    = +document.getElementById('font-sz').value;
+  const useT  = document.getElementById('use-title').checked;
+  const title = document.getElementById('title').value.trim();
+
+  cards = split(raw, fs);
+  if (useT && title) cards.unshift({ type:'cover', title });
+
+  curIdx = 0;
+  document.getElementById('empty').style.display = 'none';
+  document.getElementById('card-wrap').classList.add('on');
+
+  renderCard(0);
+  buildThumbs();
+  syncNav();
+}
+
+/* ════════════════════════════════════════
+   RENDER CARD
+════════════════════════════════════════ */
+function renderCard(i) {
+  const t  = THEMES[theme];
+  const fs = +document.getElementById('font-sz').value;
+  const nn = document.getElementById('nickname').value || '蜡笔不拿笔';
+  const tg = document.getElementById('tags').value.trim();
+  const pg = document.getElementById('use-page').checked;
+  const d  = cards[i];
+  const inner = document.getElementById('card-inner');
+
+  // Light-theme box shadow tweak
+  const isLight = theme === 'frost' || theme === 'mist';
+  document.getElementById('main-card').style.boxShadow = isLight
+    ? '0 0 0 1px rgba(0,0,0,0.06), 0 8px 30px rgba(0,0,0,0.12), 0 22px 60px rgba(0,0,0,0.08)'
+    : '0 0 0 1px rgba(255,255,255,0.045), 0 8px 30px rgba(0,0,0,0.55), 0 22px 60px rgba(0,0,0,0.38)';
+
+  inner.style.cssText = `
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    padding:30px 28px 24px;
+    background:${t.bg}; color:${t.fg};
+    font-family:'汇文明朝体','HuiWen MingTi','Noto Serif SC','Source Han Serif SC',serif;
+  `;
+
+  let h = `
+    <div class="c-stamp" style="color:${t.stamp}">${esc(nn)}</div>
+    <div class="c-rule" style="background:${t.stamp}"></div>
+  `;
+
+  if (d.type === 'cover') {
+    h += `
+      <div class="c-cover-wrap">
+        <div class="c-cover-title" style="font-size:${fs+9}px">${esc(d.title)}</div>
+        <div class="c-cover-dash">——</div>
+      </div>`;
+  } else {
+    const ps = d.paras.map(p =>
+      `<div class="c-para" style="font-size:${fs}px">${esc(p).replace(/\n/g,'<br>')}</div>`
+    ).join('');
+    h += `<div class="c-body">${ps}</div>`;
+  }
+
+  h += `
+    <div class="c-foot">
+      <div class="c-tags" style="color:${t.stamp}">${esc(tg)}</div>
+      ${pg ? `<div class="c-page">${i+1} / ${cards.length}</div>` : ''}
+    </div>`;
+
+  inner.innerHTML = h;
+}
+
+/* ════════════════════════════════════════
+   NAV
+════════════════════════════════════════ */
+async function navTo(i) {
+  if (i < 0 || i >= cards.length) return;
+  const c = document.getElementById('main-card');
+  c.classList.add('fading');
+  await wait(155);
+  curIdx = i;
+  renderCard(i);
+  c.classList.remove('fading');
+  syncNav();
+  syncThumbs();
+}
+
+function syncNav() {
+  document.getElementById('nav-count').textContent = `${curIdx+1} / ${cards.length}`;
+  document.getElementById('prev-btn').disabled = curIdx === 0;
+  document.getElementById('next-btn').disabled = curIdx === cards.length-1;
+}
+
+/* ════════════════════════════════════════
+   THUMBS
+════════════════════════════════════════ */
+function buildThumbs() {
+  const t = THEMES[theme];
+  const c = document.getElementById('thumbs');
+  c.innerHTML = '';
+  cards.forEach((_, i) => {
+    const el = document.createElement('div');
+    el.className = `thumb${i===0?' active':''}`;
+    el.dataset.i = i;
+    el.style.background = t.bg;
+    el.innerHTML = `<span class="thumb-n" style="color:${t.fg}">${i+1}</span>`;
+    el.onclick = () => navTo(i);
+    c.appendChild(el);
+  });
+}
+
+function syncThumbs() {
+  document.querySelectorAll('.thumb').forEach(el =>
+    el.classList.toggle('active', +el.dataset.i === curIdx));
+}
+
+/* ════════════════════════════════════════
+   DOWNLOAD
+════════════════════════════════════════ */
+async function dlCurrent() {
+  showOv('生成图片…');
+  try {
+    const cvs = await capture(document.getElementById('main-card'));
+    download(cvs, `蜡笔不拿笔_${pad(curIdx+1)}.png`);
+    toast('已下载 ✓');
+  } catch { toast('下载失败，请重试'); }
+  hideOv();
+}
+
+async function dlAll() {
+  if (!cards.length) return;
+  const t  = THEMES[theme];
+  const fs = +document.getElementById('font-sz').value;
+  const nn = document.getElementById('nickname').value || '蜡笔不拿笔';
+  const tg = document.getElementById('tags').value.trim();
+  const pg = document.getElementById('use-page').checked;
+
+  showOv(`生成第 1 / ${cards.length} 张…`);
+
+  // Offscreen render element
+  const off = document.createElement('div');
+  off.style.cssText = `
+    position:fixed; left:-9999px; top:0;
+    width:360px; height:480px; border-radius:4px; overflow:hidden;
+  `;
+  document.body.appendChild(off);
+
+  try {
+    for (let i = 0; i < cards.length; i++) {
+      document.getElementById('overlay-txt').textContent = `生成第 ${i+1} / ${cards.length} 张…`;
+      const d = cards[i];
+
+      let inner = `
+        <div style="font-size:10px;letter-spacing:0.24em;text-transform:uppercase;opacity:0.68;margin-bottom:5px;color:${t.stamp};font-family:'汇文明朝体','HuiWen MingTi','Noto Serif SC',serif">${esc(nn)}</div>
+        <div style="height:1px;background:${t.stamp};opacity:${t.lineOp};margin-bottom:18px"></div>
+      `;
+
+      if (d.type === 'cover') {
+        inner += `
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+            <div style="font-size:${fs+9}px;font-weight:500;line-height:1.5;letter-spacing:0.04em;margin-bottom:14px">${esc(d.title)}</div>
+            <div style="font-size:18px;opacity:0.38">——</div>
+          </div>`;
+      } else {
+        const ps = d.paras.map(p =>
+          `<div style="font-size:${fs}px;line-height:1.95;letter-spacing:0.055em;margin-bottom:1em">${esc(p).replace(/\n/g,'<br>')}</div>`
+        ).join('');
+        inner += `<div style="flex:1;overflow:hidden;word-break:break-all">${ps}</div>`;
+      }
+
+      inner += `
+        <div style="flex-shrink:0;margin-top:14px;display:flex;justify-content:space-between;align-items:flex-end">
+          <div style="font-size:10px;opacity:0.48;color:${t.stamp}">${esc(tg)}</div>
+          ${pg?`<div style="font-size:10px;opacity:0.28;letter-spacing:0.18em">${i+1} / ${cards.length}</div>`:''}
+        </div>`;
+
+      off.innerHTML = `
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 28px 24px;background:${t.bg};color:${t.fg};font-family:'汇文明朝体','HuiWen MingTi','Noto Serif SC',serif">
+          ${inner}
+        </div>`;
+
+      await wait(60);
+      const cvs = await capture(off);
+      download(cvs, `蜡笔不拿笔_${pad(i+1)}.png`);
+      await wait(220);
+    }
+    toast(`已下载全部 ${cards.length} 张 ✓`);
+  } catch (e) {
+    toast('下载失败，请重试');
+    console.error(e);
+  }
+
+  document.body.removeChild(off);
+  hideOv();
+}
+
+async function capture(el) {
+  return html2canvas(el, { scale:3, useCORS:true, logging:false, backgroundColor:null, allowTaint:true });
+}
+function download(cvs, name) {
+  const a = document.createElement('a');
+  a.download = name;
+  a.href = cvs.toDataURL('image/png');
+  a.click();
+}
+function pad(n) { return String(n).padStart(2,'0'); }
+
+/* ════════════════════════════════════════
+   UI HELPERS
+════════════════════════════════════════ */
+function onInput(el) { document.getElementById('char-n').textContent = el.value.length; }
+
+function toggleTitle() {
+  const s = document.getElementById('use-title').checked;
+  document.getElementById('title-field').style.display = s ? 'flex' : 'none';
+}
+
+function showOv(msg) {
+  document.getElementById('overlay-txt').textContent = msg;
+  document.getElementById('overlay').classList.add('on');
+}
+function hideOv() { document.getElementById('overlay').classList.remove('on'); }
+
+let _tt;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('on'), 2800);
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ════════════════════════════════════════
+   KEYBOARD
+════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (!cards.length) return;
+  if (['TEXTAREA','INPUT'].includes(e.target.tagName)) return;
+  if (e.key === 'ArrowLeft')  navTo(curIdx - 1);
+  if (e.key === 'ArrowRight') navTo(curIdx + 1);
+});
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+buildThemes();
+</script>
+</body>
+</html>
