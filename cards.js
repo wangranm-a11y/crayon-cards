@@ -71,6 +71,12 @@ window.CARDS = (function () {
     if (textColor && textColor !== 'default') {
       card.style.color = textColor;
       card.style.setProperty('--card-text-color', textColor);
+    } else {
+      // 暗色背景主题默认注入紫色，确保 CSS var() 回退不落入黑色
+      const darkDefaults = { indigo: '#c9b8e0', neon: '#f0e8ff', violet: '#c9b8e0', noir: '#d2c1de' };
+      if (darkDefaults[themeKey]) {
+        card.style.setProperty('--card-text-color', darkDefaults[themeKey]);
+      }
     }
 
     // 装饰层（顶/底装饰线、星点）
