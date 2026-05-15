@@ -229,6 +229,7 @@
   if (rtColorBtn && rtColorPopover) {
     rtColorBtn.addEventListener('mousedown', e => e.preventDefault());
     rtColorBtn.addEventListener('click', () => {
+      closeFsPopover();
       const willShow = rtColorPopover.hidden;
       rtColorPopover.hidden = !willShow;
       rtColorBtn.classList.toggle('active', willShow);
@@ -247,6 +248,69 @@
     });
     window.addEventListener('scroll', () => { if (!rtColorPopover.hidden) positionColorPopover(); }, { passive: true });
     window.addEventListener('resize', () => { if (!rtColorPopover.hidden) positionColorPopover(); });
+  }
+
+  // ============ 单段字号 popover ============
+  const rtFsBtn = $('#rtFontSizeBtn');
+  const rtFsPopover = $('#rtFsPopover');
+
+  function positionFsPopover() {
+    if (!rtFsBtn || !rtFsPopover) return;
+    const rect = rtFsBtn.getBoundingClientRect();
+    rtFsPopover.style.top = `${rect.bottom + 6}px`;
+    let left = rect.left;
+    const pw = rtFsPopover.offsetWidth || 280;
+    const maxLeft = document.documentElement.clientWidth - pw - 8;
+    if (left > maxLeft) left = Math.max(8, maxLeft);
+    rtFsPopover.style.left = `${left}px`;
+  }
+  function closeFsPopover() {
+    if (!rtFsPopover) return;
+    rtFsPopover.hidden = true;
+    if (rtFsBtn) rtFsBtn.classList.remove('active');
+  }
+  function applyPartialFontSize(px) {
+    editor.focus();
+    const sel = window.getSelection();
+    if (!sel.rangeCount || sel.isCollapsed) { closeFsPopover(); return; }
+    try {
+      if (px === 'default') {
+        // 清除选中区域的 font-size span
+        document.execCommand('styleWithCSS', false, true);
+        document.execCommand('removeFormat', false, null);
+      } else {
+        const range = sel.getRangeAt(0);
+        const content = range.extractContents();
+        const span = document.createElement('span');
+        span.style.fontSize = px + 'px';
+        span.appendChild(content);
+        range.insertNode(span);
+        sel.removeAllRanges();
+      }
+    } catch (e) { /* ignore */ }
+    closeFsPopover();
+  }
+  if (rtFsBtn && rtFsPopover) {
+    rtFsBtn.addEventListener('mousedown', e => e.preventDefault());
+    rtFsBtn.addEventListener('click', () => {
+      const willShow = rtFsPopover.hidden;
+      // 关闭颜色 popover
+      closeColorPopover();
+      rtFsPopover.hidden = !willShow;
+      rtFsBtn.classList.toggle('active', willShow);
+      if (willShow) positionFsPopover();
+    });
+    rtFsPopover.querySelectorAll('[data-fs]').forEach(b => {
+      b.addEventListener('mousedown', e => e.preventDefault());
+      b.addEventListener('click', () => applyPartialFontSize(b.dataset.fs));
+    });
+    document.addEventListener('mousedown', e => {
+      if (!rtFsBtn.contains(e.target) && !rtFsPopover.contains(e.target)) {
+        closeFsPopover();
+      }
+    });
+    window.addEventListener('scroll', () => { if (!rtFsPopover.hidden) positionFsPopover(); }, { passive: true });
+    window.addEventListener('resize', () => { if (!rtFsPopover.hidden) positionFsPopover(); });
   }
 
   // ============ 图片选中 + 浮动工具栏 ============

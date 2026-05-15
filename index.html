@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://fontsapi.zeoseven.com/256/main/result.css" />
-  <link rel="stylesheet" href="styles.css?v=21" />
+  <link rel="stylesheet" href="styles.css?v=22" />
 
   <!-- html2canvas: DOM → PNG -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -86,6 +86,18 @@
                   <span class="rt-cp-custom-icon">+</span>
                   <input type="color" id="textColor" value="#c84b31" />
                 </label>
+              </div>
+            </div>
+
+            <div class="rt-fs-popover-wrap">
+              <button type="button" class="rt-btn" id="rtFontSizeBtn" title="单段字号 · 选中文字后点这里">A<span style="font-size:10px;">↑</span></button>
+              <div class="rt-color-popover" id="rtFsPopover" hidden>
+                <button type="button" class="rt-cp-default" data-fs="default">默认</button>
+                <span class="rt-cp-divider"></span>
+                <button type="button" class="rt-cp-swatch" data-fs="36" style="background:var(--paper);color:var(--ink);font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;">小</button>
+                <button type="button" class="rt-cp-swatch" data-fs="48" style="background:var(--paper);color:var(--ink);font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;">中</button>
+                <button type="button" class="rt-cp-swatch" data-fs="64" style="background:var(--paper);color:var(--ink);font-size:16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;">大</button>
+                <button type="button" class="rt-cp-swatch" data-fs="80" style="background:var(--paper);color:var(--ink);font-size:19px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;">特大</button>
               </div>
             </div>
 
@@ -223,8 +235,8 @@
     <button type="button" class="img-tb-btn" data-act="delete" title="删除">×</button>
   </div>
 
-  <script src="cards.js?v=21"></script>
-  <script src="app.js?v=21"></script>
+  <script src="cards.js?v=22"></script>
+  <script src="app.js?v=22"></script>
 
   <script>
     if ('serviceWorker' in navigator) {
