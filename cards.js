@@ -62,8 +62,9 @@ window.CARDS = (function () {
     const card = document.createElement('div');
     let cls = `card card-${themeKey}`;
     if (font && font !== 'default') cls += ` card-font-${font}`;
-    if (fontSize && fontSize !== 'm') cls += ` card-fontsize-${fontSize}`;
     card.className = cls;
+
+    // 正文内容区（稍后在 makeContentPage / makeCoverPage 中填充）
     card.setAttribute('data-theme', themeKey);
 
     // 全局正文颜色覆盖（继承 + CSS 变量双管齐下，覆盖各主题已显式设置的 p/blockquote 色）
@@ -136,6 +137,9 @@ window.CARDS = (function () {
     test.classList.add('card-offscreen');
     document.body.appendChild(test);
     const content = test.querySelector('.card-content');
+    if (opts.fontSize && opts.fontSize !== '44') {
+      content.style.fontSize = opts.fontSize + 'px';
+    }
 
     const pages = [];
     let buffer = []; // 当前页累积的 HTML 字符串
@@ -458,6 +462,9 @@ window.CARDS = (function () {
     const card = makeCardEl(themeKey, opts);
     card.classList.add('card-cover');
     const content = card.querySelector('.card-content');
+    if (opts.fontSize && opts.fontSize !== '44') {
+      content.style.fontSize = opts.fontSize + 'px';
+    }
     const t = document.createElement('h1');
     t.className = 'cover-title';
     t.textContent = title;
@@ -471,6 +478,9 @@ window.CARDS = (function () {
   function makeContentPage(htmlContent, themeKey, opts) {
     const card = makeCardEl(themeKey, opts);
     const content = card.querySelector('.card-content');
+    if (opts.fontSize && opts.fontSize !== '44') {
+      content.style.fontSize = opts.fontSize + 'px';
+    }
     content.innerHTML = htmlContent;
     return card;
   }

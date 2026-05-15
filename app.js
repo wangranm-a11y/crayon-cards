@@ -15,7 +15,7 @@
     nickname: localStorage.getItem('cc.nickname') || '蜡笔不拿笔',
     theme: localStorage.getItem('cc.theme') || 'cream',
     font: localStorage.getItem('cc.font') || 'default',
-    fontSize: localStorage.getItem('cc.fontSize') || 'm',
+    fontSize: localStorage.getItem('cc.fontSize') || '44',
     textColor: localStorage.getItem('cc.textColor') || 'default',
     tag: localStorage.getItem('cc.tag') || '',
     showPage: true,
@@ -79,18 +79,44 @@
     });
   }
 
-  // Font size picker
-  const fsWrap = $('#fontsizePicker');
-  if (fsWrap) {
-    fsWrap.querySelectorAll('.fs-btn').forEach(b => {
-      if (b.dataset.size === state.fontSize) b.classList.add('active');
-      b.addEventListener('click', () => {
-        fsWrap.querySelectorAll('.fs-btn').forEach(x => x.classList.remove('active'));
-        b.classList.add('active');
-        state.fontSize = b.dataset.size;
-        localStorage.setItem('cc.fontSize', state.fontSize);
-        if (!$('#previewView').hidden) regenerate();
+  // Font size picker (buttons + slider)
+  const fsSlider = $('#fontsizeSlider');
+  const fsLabel = $('#fontsizeLabel');
+  const fsButtons = document.querySelectorAll('.fs-btn');
+
+  function setFontSize(sizePx) {
+    state.fontSize = String(sizePx);
+    localStorage.setItem('cc.fontSize', state.fontSize);
+    if (fsSlider) fsSlider.value = sizePx;
+    if (fsLabel) fsLabel.textContent = sizePx + 'px';
+    fsButtons.forEach(b => {
+      b.classList.toggle('active', b.dataset.size === String(sizePx));
+    });
+    if (!$('#previewView').hidden) regenerate();
+  }
+
+  if (fsSlider) {
+    fsSlider.value = state.fontSize;
+  }
+  if (fsLabel) {
+    fsLabel.textContent = state.fontSize + 'px';
+  }
+  // init button state
+  fsButtons.forEach(b => {
+    if (b.dataset.size === state.fontSize) b.classList.add('active');
+    b.addEventListener('click', () => setFontSize(b.dataset.size));
+  });
+  // slider input
+  if (fsSlider) {
+    fsSlider.addEventListener('input', () => {
+      const v = fsSlider.value;
+      if (fsLabel) fsLabel.textContent = v + 'px';
+      fsButtons.forEach(b => {
+        b.classList.toggle('active', b.dataset.size === v);
       });
+    });
+    fsSlider.addEventListener('change', () => {
+      setFontSize(fsSlider.value);
     });
   }
 

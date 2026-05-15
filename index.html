@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://fontsapi.zeoseven.com/256/main/result.css" />
-  <link rel="stylesheet" href="styles.css?v=20" />
+  <link rel="stylesheet" href="styles.css?v=21" />
 
   <!-- html2canvas: DOM → PNG -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -133,13 +133,14 @@
 
       <!-- 字号 -->
       <div class="field">
-        <span class="field-label">正文字号</span>
-        <div class="fontsize-picker" id="fontsizePicker">
-          <button type="button" class="fs-btn" data-size="s">小</button>
-          <button type="button" class="fs-btn active" data-size="m">默认</button>
-          <button type="button" class="fs-btn" data-size="l">大</button>
-          <button type="button" class="fs-btn" data-size="xl">特大</button>
+        <span class="field-label">正文字号 <span id="fontsizeLabel">44px</span></span>
+        <div class="fontsize-picker">
+          <button type="button" class="fs-btn" data-size="32">小</button>
+          <button type="button" class="fs-btn active" data-size="44">默认</button>
+          <button type="button" class="fs-btn" data-size="56">大</button>
+          <button type="button" class="fs-btn" data-size="68">特大</button>
         </div>
+        <input type="range" id="fontsizeSlider" min="24" max="80" value="44" step="1" class="fs-slider" />
       </div>
 
       <!-- 正文颜色 -->
@@ -222,8 +223,8 @@
     <button type="button" class="img-tb-btn" data-act="delete" title="删除">×</button>
   </div>
 
-  <script src="cards.js?v=20"></script>
-  <script src="app.js?v=20"></script>
+  <script src="cards.js?v=21"></script>
+  <script src="app.js?v=21"></script>
 
   <script>
     if ('serviceWorker' in navigator) {

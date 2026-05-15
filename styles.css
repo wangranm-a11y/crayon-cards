@@ -455,15 +455,16 @@ input[type="text"]:focus { border-color: var(--accent); }
 .fontsize-picker {
   display: flex;
   gap: 8px;
+  margin-bottom: 10px;
 }
 .fs-btn {
   flex: 1;
-  padding: 12px 8px;
+  padding: 10px 6px;
   background: var(--paper);
   border: 1.5px solid var(--line);
   border-radius: var(--r-sm);
   color: var(--ink-soft);
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -474,12 +475,39 @@ input[type="text"]:focus { border-color: var(--accent); }
   color: var(--accent);
   box-shadow: 0 0 0 2px rgba(200,75,49,0.18);
 }
+.fs-slider {
+  display: block;
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--line);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  margin-top: 4px;
+}
+.fs-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.fs-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.fs-slider::-moz-range-thumb {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
 
-/* ============ Card Font Size Classes ============ */
-.card-fontsize-s .card-content { font-size: 36px; }
-.card-fontsize-m .card-content { font-size: 44px; }
-.card-fontsize-l .card-content { font-size: 54px; }
-.card-fontsize-xl .card-content { font-size: 66px; }
+/* ============ Card Font Size ============ */
 
 /* ============ Text Color Picker ============ */
 .text-color-picker {
