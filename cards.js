@@ -55,12 +55,14 @@ window.CARDS = (function () {
       pageIndex = 0, totalPages = 1,
       showPage = true, showNickname = true,
       tag = '', font = 'default',
+      fontSize = 'm',
       textColor = 'default',
       avatar = 'icons/avatar.png',
     } = opts;
     const card = document.createElement('div');
     let cls = `card card-${themeKey}`;
     if (font && font !== 'default') cls += ` card-font-${font}`;
+    if (fontSize && fontSize !== 'm') cls += ` card-fontsize-${fontSize}`;
     card.className = cls;
     card.setAttribute('data-theme', themeKey);
 

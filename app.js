@@ -15,6 +15,7 @@
     nickname: localStorage.getItem('cc.nickname') || '蜡笔不拿笔',
     theme: localStorage.getItem('cc.theme') || 'cream',
     font: localStorage.getItem('cc.font') || 'default',
+    fontSize: localStorage.getItem('cc.fontSize') || 'm',
     textColor: localStorage.getItem('cc.textColor') || 'default',
     tag: localStorage.getItem('cc.tag') || '',
     showPage: true,
@@ -73,6 +74,21 @@
         b.classList.add('active');
         state.font = b.dataset.font;
         localStorage.setItem('cc.font', state.font);
+        if (!$('#previewView').hidden) regenerate();
+      });
+    });
+  }
+
+  // Font size picker
+  const fsWrap = $('#fontsizePicker');
+  if (fsWrap) {
+    fsWrap.querySelectorAll('.fs-btn').forEach(b => {
+      if (b.dataset.size === state.fontSize) b.classList.add('active');
+      b.addEventListener('click', () => {
+        fsWrap.querySelectorAll('.fs-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        state.fontSize = b.dataset.size;
+        localStorage.setItem('cc.fontSize', state.fontSize);
         if (!$('#previewView').hidden) regenerate();
       });
     });
@@ -548,6 +564,7 @@
       showNickname: state.showNickname,
       tag: state.tag,
       font: state.font,
+      fontSize: state.fontSize,
       textColor: state.textColor,
       avatar: state.avatar,
     };

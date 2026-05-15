@@ -451,6 +451,36 @@ input[type="text"]:focus { border-color: var(--accent); }
   box-shadow: 0 0 0 2px rgba(200,75,49,0.18);
 }
 
+/* ============ Font Size Picker ============ */
+.fontsize-picker {
+  display: flex;
+  gap: 8px;
+}
+.fs-btn {
+  flex: 1;
+  padding: 12px 8px;
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink-soft);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.fs-btn:hover { border-color: var(--accent); color: var(--accent); }
+.fs-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(200,75,49,0.18);
+}
+
+/* ============ Card Font Size Classes ============ */
+.card-fontsize-s .card-content { font-size: 36px; }
+.card-fontsize-m .card-content { font-size: 44px; }
+.card-fontsize-l .card-content { font-size: 54px; }
+.card-fontsize-xl .card-content { font-size: 66px; }
+
 /* ============ Text Color Picker ============ */
 .text-color-picker {
   display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
