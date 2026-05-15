@@ -19,42 +19,17 @@ window.CARDS = (function () {
       name: '暗夜诗笺',
       previewBg: 'linear-gradient(180deg, #1c1838, #0a0820)',
     },
-    pastel: {
-      name: '春日卡片',
-      previewBg: 'linear-gradient(135deg, #ffe8e8, #fff5e8 50%, #e8f0ff)',
-    },
     charcoal: {
       name: '炭笔速写',
       previewBg: '#f5f1e6',
     },
-    magazine: {
-      name: '杂志大字',
-      previewBg: '#fafafa',
-    },
-    // —— 新增 6 个 ——
     minimal: {
       name: '极简白',
       previewBg: '#ffffff',
     },
-    sunset: {
-      name: '晚霞',
-      previewBg: 'linear-gradient(180deg, #ffd6a0 0%, #ff8a9c 50%, #c084fc 100%)',
-    },
-    latte: {
-      name: '奶咖',
-      previewBg: 'linear-gradient(180deg, #f5e6d3 0%, #e8d0b3 100%)',
-    },
-    lavender: {
-      name: '薰衣草',
-      previewBg: 'linear-gradient(180deg, #f3eaff 0%, #e9d8ff 100%)',
-    },
     neon: {
       name: '暗夜霓虹',
       previewBg: 'linear-gradient(180deg, #0a0a18 0%, #1a0a2e 100%)',
-    },
-    classical: {
-      name: '古籍',
-      previewBg: '#ede0c8',
     },
     editorial: {
       name: '编辑手记',

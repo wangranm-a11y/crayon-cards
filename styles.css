@@ -676,27 +676,27 @@ input[type="text"]:focus { border-color: var(--accent); }
 
 /* —— 字体选择（覆盖卡片正文区 + 左上角昵称字体） —— */
 .card-font-serif .card-content,
-.card-font-serif .card-content > *,
+.card-font-serif .card-content > *:not(h1):not(h2):not(h3),
 .card-font-serif .card-avatar-name { font-family: var(--font-serif); }
 .card-font-sans .card-content,
-.card-font-sans .card-content > *,
+.card-font-sans .card-content > *:not(h1):not(h2):not(h3),
 .card-font-sans .card-avatar-name { font-family: var(--font-sans); }
 .card-font-handwrite .card-content,
-.card-font-handwrite .card-content > *,
+.card-font-handwrite .card-content > *:not(h1):not(h2):not(h3),
 .card-font-handwrite .card-avatar-name {
   font-family: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', 'Kaiti SC', cursive;
   letter-spacing: 0.02em;
 }
 .card-font-handwrite .card-content > p { line-height: 1.95; }
 .card-font-huiwen .card-content,
-.card-font-huiwen .card-content > *,
+.card-font-huiwen .card-content > *:not(h1):not(h2):not(h3),
 .card-font-huiwen .card-avatar-name {
   font-family: 'Huiwen-mincho', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif;
   letter-spacing: 0.03em;
 }
 .card-font-huiwen .card-content > p { line-height: 1.92; }
 .card-font-xique .card-content,
-.card-font-xique .card-content > *,
+.card-font-xique .card-content > *:not(h1):not(h2):not(h3),
 .card-font-xique .card-avatar-name {
   font-family: 'XiQueZaiShanLin', 'Ma Shan Zheng', 'STKaiti', 'KaiTi', cursive;
   letter-spacing: 0.02em;
@@ -788,7 +788,7 @@ input[type="text"]:focus { border-color: var(--accent); }
 .card-content > h3 {
   font-family: var(--font-serif);
   font-weight: 800;
-  font-size: 1.5em;
+  font-size: 2em;
   line-height: 1.32;
   margin: 0 0 26px;
   letter-spacing: -0.01em;
@@ -879,7 +879,8 @@ input[type="text"]:focus { border-color: var(--accent); }
   top: 280px;
 }
 .card-cover .cover-title {
-  font-weight: 800;
+  font-family: var(--font-serif);
+  font-weight: 900;
   font-size: 120px;
   line-height: 1.14;
   margin: 0 0 60px;
@@ -972,36 +973,6 @@ input[type="text"]:focus { border-color: var(--accent); }
 }
 
 /* ==========================================================
-   主题 3：春日卡片
-   ========================================================== */
-.card-pastel {
-  background: linear-gradient(135deg, #ffe8e8 0%, #fff5e8 50%, #e8f0ff 100%);
-  color: #3a2840;
-}
-.card-pastel .card-deco {
-  background:
-    radial-gradient(circle at 90% 12%, rgba(255,184,216,0.50) 0%, transparent 24%),
-    radial-gradient(circle at 8% 88%, rgba(184,216,245,0.45) 0%, transparent 26%),
-    radial-gradient(circle at 50% 50%, rgba(197,232,197,0.30) 0%, transparent 18%);
-}
-.card-pastel .card-stamp { background: #fff; color: #3a2840; border: 1.5px solid rgba(58,40,64,0.18); }
-.card-pastel .card-stamp-dot { background: #ff7a9a; }
-.card-pastel .card-page { color: rgba(58,40,64,0.42); }
-.card-pastel .cover-title { color: #3a2840; }
-
-.theme-pastel { background: linear-gradient(135deg, #ffe8e8, #e8f0ff); position: relative; }
-.theme-pastel::before {
-  content: ''; position: absolute; left: 6px; top: 6px;
-  width: 16px; height: 6px; border-radius: 3px; background: #3a2840;
-}
-.theme-pastel::after {
-  content: ''; position: absolute; left: 8px; top: 24px;
-  width: 36px; height: 2px; border-radius: 1px;
-  background: rgba(58,40,64,0.4);
-  box-shadow: 0 6px 0 rgba(58,40,64,0.4), 0 12px 0 rgba(58,40,64,0.4), 0 18px 0 rgba(58,40,64,0.3);
-}
-
-/* ==========================================================
    主题 4：炭笔速写
    ========================================================== */
 .card-charcoal {
@@ -1034,43 +1005,6 @@ input[type="text"]:focus { border-color: var(--accent); }
   width: 36px; height: 2px; border-radius: 1px;
   background: rgba(38,34,29,0.45);
   box-shadow: 0 6px 0 rgba(38,34,29,0.45), 0 12px 0 rgba(38,34,29,0.45), 0 18px 0 rgba(38,34,29,0.32);
-}
-
-/* ==========================================================
-   主题 5：杂志大字
-   ========================================================== */
-.card-magazine {
-  background: #fafafa;
-  color: #1a1a1a;
-  font-family: var(--font-sans);
-  font-weight: 500;
-}
-.card-magazine .card-deco::before {
-  /* 上下黑边 */
-  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 12px; background: #1a1a1a;
-  box-shadow: 0 1428px 0 #1a1a1a;
-}
-.card-magazine .card-deco::after {
-  /* 左侧粗红条 */
-  content: ''; position: absolute; left: 60px; top: 280px; width: 8px; height: 880px;
-  background: #ff4040;
-}
-.card-magazine .card-stamp { background: #1a1a1a; color: #fafafa; }
-.card-magazine .card-stamp-dot { background: #ff4040; }
-.card-magazine .card-page { color: rgba(26,26,26,0.50); }
-.card-magazine .cover-title { color: #1a1a1a; font-weight: 900; font-size: 120px; line-height: 1.10; }
-.card-magazine .card-content > p { font-weight: 600; }
-
-.theme-magazine { background: #fafafa; border: 1px solid #1a1a1a; position: relative; }
-.theme-magazine::before {
-  content: ''; position: absolute; left: 6px; top: 6px;
-  width: 16px; height: 6px; border-radius: 3px; background: #1a1a1a;
-}
-.theme-magazine::after {
-  content: ''; position: absolute; left: 8px; top: 24px;
-  width: 36px; height: 2px; border-radius: 1px;
-  background: rgba(26,26,26,0.5);
-  box-shadow: 0 6px 0 rgba(26,26,26,0.5), 0 12px 0 rgba(26,26,26,0.5), 0 18px 0 rgba(26,26,26,0.4);
 }
 
 /* ==========================================================
@@ -1107,106 +1041,6 @@ input[type="text"]:focus { border-color: var(--accent); }
   width: 36px; height: 2px; border-radius: 1px;
   background: rgba(26,26,26,0.45);
   box-shadow: 0 6px 0 rgba(26,26,26,0.45), 0 12px 0 rgba(26,26,26,0.45), 0 18px 0 rgba(26,26,26,0.32);
-}
-
-/* ==========================================================
-   主题 7：晚霞
-   ========================================================== */
-.card-sunset {
-  background: linear-gradient(180deg, #ffd6a0 0%, #ff8a9c 50%, #c084fc 100%);
-  color: #2a1830;
-}
-.card-sunset .card-deco {
-  background:
-    radial-gradient(circle at 80% 18%, rgba(255,255,255,0.55) 0%, transparent 22%),
-    radial-gradient(circle at 90% 16%, rgba(255,210,140,0.45) 0%, transparent 14%);
-}
-.card-sunset .card-stamp {
-  background: rgba(255,255,255,0.85);
-  color: #2a1830;
-  backdrop-filter: blur(8px);
-}
-.card-sunset .card-stamp-dot { background: #ee6a82; }
-.card-sunset .card-page { color: rgba(42,24,48,0.55); }
-
-.theme-sunset {
-  background: linear-gradient(180deg, #ffd6a0 0%, #ff8a9c 50%, #c084fc 100%);
-  position: relative;
-}
-.theme-sunset::before { content: ''; position: absolute; left: 6px; top: 6px; width: 16px; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.85); }
-.theme-sunset::after {
-  content: ''; position: absolute; left: 8px; top: 24px;
-  width: 36px; height: 2px; border-radius: 1px;
-  background: rgba(42,24,48,0.55);
-  box-shadow: 0 6px 0 rgba(42,24,48,0.55), 0 12px 0 rgba(42,24,48,0.55), 0 18px 0 rgba(42,24,48,0.40);
-}
-
-/* ==========================================================
-   主题 8：奶咖
-   ========================================================== */
-.card-latte {
-  background: linear-gradient(180deg, #f5e6d3 0%, #e8d0b3 100%);
-  color: #3e2918;
-}
-.card-latte .card-deco::before {
-  /* 右上角小咖啡杯印章 */
-  content: '☕'; position: absolute; top: 96px; right: 100px;
-  font-size: 56px; opacity: 0.30;
-}
-.card-latte .card-deco::after {
-  /* 一条手画蜿蜒细线 */
-  content: ''; position: absolute; left: 96px; right: 96px; top: 200px;
-  height: 1px; background: rgba(62,41,24,0.30);
-  box-shadow: 0 1190px 0 rgba(62,41,24,0.30);
-}
-.card-latte .card-stamp {
-  background: #3e2918;
-  color: #f5e6d3;
-}
-.card-latte .card-stamp-dot { background: #d4a574; }
-.card-latte .card-page { color: rgba(62,41,24,0.50); }
-
-.theme-latte { background: linear-gradient(180deg, #f5e6d3, #e8d0b3); position: relative; }
-.theme-latte::before { content: ''; position: absolute; left: 6px; top: 6px; width: 16px; height: 6px; border-radius: 3px; background: #3e2918; }
-.theme-latte::after {
-  content: ''; position: absolute; left: 8px; top: 24px;
-  width: 36px; height: 2px; border-radius: 1px;
-  background: rgba(62,41,24,0.45);
-  box-shadow: 0 6px 0 rgba(62,41,24,0.45), 0 12px 0 rgba(62,41,24,0.45), 0 18px 0 rgba(62,41,24,0.32);
-}
-
-/* ==========================================================
-   主题 9：薰衣草
-   ========================================================== */
-.card-lavender {
-  background: linear-gradient(180deg, #f3eaff 0%, #e9d8ff 100%);
-  color: #3d2e5e;
-}
-.card-lavender .card-deco {
-  background:
-    radial-gradient(circle at 88% 12%, rgba(168,135,232,0.38) 0%, transparent 18%),
-    radial-gradient(circle at 12% 88%, rgba(255,184,216,0.32) 0%, transparent 22%);
-}
-.card-lavender .card-deco::after {
-  /* 角落小花 */
-  content: '✿'; position: absolute; top: 92px; right: 96px;
-  font-size: 38px; color: #a98be0; opacity: 0.55;
-}
-.card-lavender .card-stamp {
-  background: rgba(255,255,255,0.85);
-  color: #3d2e5e;
-  border: 1.5px solid rgba(61,46,94,0.20);
-}
-.card-lavender .card-stamp-dot { background: #a98be0; }
-.card-lavender .card-page { color: rgba(61,46,94,0.45); }
-
-.theme-lavender { background: linear-gradient(180deg, #f3eaff, #e9d8ff); position: relative; }
-.theme-lavender::before { content: ''; position: absolute; left: 6px; top: 6px; width: 16px; height: 6px; border-radius: 3px; background: #3d2e5e; }
-.theme-lavender::after {
-  content: ''; position: absolute; left: 8px; top: 24px;
-  width: 36px; height: 2px; border-radius: 1px;
-  background: rgba(61,46,94,0.45);
-  box-shadow: 0 6px 0 rgba(61,46,94,0.45), 0 12px 0 rgba(61,46,94,0.45), 0 18px 0 rgba(61,46,94,0.32);
 }
 
 /* ==========================================================
@@ -1256,56 +1090,6 @@ input[type="text"]:focus { border-color: var(--accent); }
   width: 36px; height: 2px; border-radius: 1px;
   background: rgba(240,232,255,0.55);
   box-shadow: 0 6px 0 rgba(240,232,255,0.55), 0 12px 0 rgba(240,232,255,0.55), 0 18px 0 rgba(240,232,255,0.40);
-}
-
-/* ==========================================================
-   主题 11：古籍
-   ========================================================== */
-.card-classical {
-  background:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 1080 1440' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.45 0 0 0 0 0.30 0 0 0 0.13 0'/%3E%3C/filter%3E%3Crect width='1080' height='1440' filter='url(%23n)'/%3E%3C/svg%3E"),
-    #ede0c8;
-  color: #2a1810;
-  font-family: var(--font-serif);
-  font-weight: 500;
-}
-.card-classical .card-deco::before {
-  /* 左侧竖排装饰线 */
-  content: ''; position: absolute; left: 60px; top: 220px; width: 4px; bottom: 200px;
-  background: rgba(176,48,32,0.55);
-}
-.card-classical .card-deco::after {
-  /* 右下角古印章 */
-  content: '钤'; position: absolute; bottom: 88px; left: 92px;
-  width: 56px; height: 56px;
-  background: #b03020; color: #ede0c8;
-  font-size: 32px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 4px;
-  font-family: var(--font-serif);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.18);
-}
-.card-classical .card-stamp {
-  background: #2a1810;
-  color: #ede0c8;
-  font-family: var(--font-serif);
-  font-weight: 600;
-}
-.card-classical .card-stamp-dot { background: #b03020; }
-.card-classical .card-page { color: rgba(42,24,16,0.50); font-family: var(--font-serif); }
-
-.theme-classical { background: #ede0c8; position: relative; }
-.theme-classical::before { content: ''; position: absolute; left: 6px; top: 6px; width: 16px; height: 6px; border-radius: 3px; background: #2a1810; }
-.theme-classical::after {
-  content: ''; position: absolute; left: 8px; top: 24px;
-  width: 36px; height: 2px; border-radius: 1px;
-  background: rgba(42,24,16,0.50);
-  box-shadow: 0 6px 0 rgba(42,24,16,0.50), 0 12px 0 rgba(42,24,16,0.50), 0 18px 0 rgba(42,24,16,0.36);
-}
-.theme-classical-strip {
-  /* 缩略图加一条左侧红条 */
-  position: absolute; left: 6px; bottom: 6px; width: 3px; top: 36px;
-  background: #b03020;
 }
 
 /* ==========================================================
@@ -1402,7 +1186,6 @@ input[type="text"]:focus { border-color: var(--accent); }
 .card-editorial .card-content > h1,
 .card-editorial .card-content > h2,
 .card-editorial .card-content > h3 {
-  font-family: var(--font-serif);
   font-weight: 800;
   font-size: 60px;
   line-height: 1.28;
@@ -1529,7 +1312,6 @@ input[type="text"]:focus { border-color: var(--accent); }
 .card-violet .card-content > h1,
 .card-violet .card-content > h2,
 .card-violet .card-content > h3 {
-  font-family: 'Huiwen-mincho', 'Noto Serif SC', serif;
   font-weight: 700;
   font-size: 64px;
   line-height: 1.28;
@@ -1662,6 +1444,7 @@ input[type="text"]:focus { border-color: var(--accent); }
 
 /* —— 内嵌封面标题：第 1 张卡顶部大字 + 主题色下划线 —— */
 .card-content > h1.cover-title-inline {
+  font-family: var(--font-serif);
   font-weight: 900;
   font-size: 112px;
   line-height: 1.16;
@@ -1682,23 +1465,10 @@ input[type="text"]:focus { border-color: var(--accent); }
 /* 每个主题的 accent 色 */
 .card-cream { --card-accent: #c84b31; --card-tag-bg: rgba(200,75,49,0.12); --card-tag-fg: #c84b31; --card-tag-border: rgba(200,75,49,0.32); }
 .card-indigo { --card-accent: #ff8a9c; --card-tag-bg: rgba(255,255,255,0.10); --card-tag-fg: #f4f0e8; --card-tag-border: rgba(255,255,255,0.22); }
-.card-pastel { --card-accent: #ff7a9a; --card-tag-bg: rgba(255,255,255,0.78); --card-tag-fg: #3a2840; --card-tag-border: rgba(58,40,64,0.18); }
 .card-charcoal { --card-accent: #c64f1f; --card-tag-bg: rgba(38,34,29,0.10); --card-tag-fg: #26221d; --card-tag-border: rgba(38,34,29,0.40); }
-.card-magazine { --card-accent: #ff4040; --card-tag-bg: #1a1a1a; --card-tag-fg: #fafafa; --card-tag-border: #1a1a1a; }
 .card-minimal { --card-accent: #1a1a1a; --card-tag-bg: transparent; --card-tag-fg: #1a1a1a; --card-tag-border: rgba(26,26,26,0.30); }
-.card-sunset { --card-accent: #ee6a82; --card-tag-bg: rgba(255,255,255,0.78); --card-tag-fg: #2a1830; --card-tag-border: rgba(42,24,48,0.18); }
-.card-latte { --card-accent: #d4a574; --card-tag-bg: rgba(62,41,24,0.12); --card-tag-fg: #3e2918; --card-tag-border: rgba(62,41,24,0.30); }
-.card-lavender { --card-accent: #a98be0; --card-tag-bg: rgba(255,255,255,0.78); --card-tag-fg: #3d2e5e; --card-tag-border: rgba(61,46,94,0.20); }
 .card-neon { --card-accent: #ff4d8d; --card-tag-bg: rgba(255,77,141,0.12); --card-tag-fg: #ff4d8d; --card-tag-border: #ff4d8d; }
-.card-classical { --card-accent: #b03020; --card-tag-bg: rgba(176,48,32,0.10); --card-tag-fg: #b03020; --card-tag-border: rgba(176,48,32,0.40); }
 .card-editorial { --card-accent: #b8956a; }
 .card-violet { --card-accent: #c9b8e0; --card-tag-bg: rgba(201,184,224,0.12); --card-tag-fg: #c9b8e0; --card-tag-border: rgba(201,184,224,0.35); }
 .card-noir { --card-accent: #d2c1de; --card-tag-bg: rgba(210,193,222,0.12); --card-tag-fg: #d2c1de; --card-tag-border: rgba(210,193,222,0.35); }
 
-/* 杂志主题：标题极重，黑底色 */
-.card-magazine .card-content > h1.cover-title-inline {
-  font-weight: 900;
-  font-size: 132px;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
-}
