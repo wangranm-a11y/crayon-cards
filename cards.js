@@ -60,6 +60,14 @@ window.CARDS = (function () {
       name: '编辑手记',
       previewBg: '#f5efe2',
     },
+    violet: {
+      name: '紫夜',
+      previewBg: '#0a0a0a',
+    },
+    noir: {
+      name: '墨紫',
+      previewBg: '#000000',
+    },
   };
 
   /**
@@ -73,6 +81,7 @@ window.CARDS = (function () {
       showPage = true, showNickname = true,
       tag = '', font = 'default',
       textColor = 'default',
+      avatar = 'icons/avatar.png',
     } = opts;
     const card = document.createElement('div');
     let cls = `card card-${themeKey}`;
@@ -97,12 +106,15 @@ window.CARDS = (function () {
     chapterNum.textContent = String(pageIndex + 1).padStart(2, '0');
     card.appendChild(chapterNum);
 
-    // 昵称印章
+    // 头像区域（showNickname 时显示；所有主题默认小图横排，noir 主题通过 CSS 放大）
     if (showNickname) {
-      const stamp = document.createElement('div');
-      stamp.className = 'card-stamp';
-      stamp.innerHTML = `<span class="card-stamp-dot"></span><span class="card-stamp-name">${escapeHtml(nickname)}</span>`;
-      card.appendChild(stamp);
+      const avatarWrap = document.createElement('div');
+      avatarWrap.className = 'card-avatar-wrap';
+      avatarWrap.innerHTML = `
+        <img class="card-avatar" src="${escapeHtml(avatar)}" alt="avatar" />
+        <div class="card-avatar-name">@${escapeHtml(nickname)}</div>
+      `;
+      card.appendChild(avatarWrap);
     }
 
     // 内容容器

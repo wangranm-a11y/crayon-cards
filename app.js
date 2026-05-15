@@ -21,6 +21,7 @@
     showNickname: true,
     autoCover: true,
     color: localStorage.getItem('cc.color') || '#c84b31',
+    avatar: localStorage.getItem('cc.avatar') || 'icons/avatar.png',
     cards: [], // 渲染好的卡片元素列表
   };
 
@@ -36,6 +37,7 @@
   const showNickEl = $('#showNickname');
   const autoCoverEl = $('#autoCover');
   const fileInput = $('#imageFile');
+  const avatarInput = $('#avatarInput');
 
   // ============ Init ============
   nickEl.value = state.nickname;
@@ -45,6 +47,21 @@
   autoCoverEl.checked = true;
   colorInput.value = state.color;
   colorIcon.style.color = state.color;
+
+  // Avatar upload
+  if (avatarInput) {
+    avatarInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        state.avatar = ev.target.result;
+        localStorage.setItem('cc.avatar', state.avatar);
+        if (!$('#previewView').hidden) regenerate();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 
   // Font picker
   const fontWrap = $('#fontPicker');
@@ -532,6 +549,7 @@
       tag: state.tag,
       font: state.font,
       textColor: state.textColor,
+      avatar: state.avatar,
     };
 
     // 1. 准备拆页输入（如果有标题，把它作为大字 H1 加在最前面，

@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'XiQueZaiShanLin';
+  src: url('fonts/xiquezaishanlin.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ==========================================================
    蜡笔卡 v2 · 样式
    • UI: 暖米白底 + 系统字体
@@ -422,7 +430,7 @@ input[type="text"]:focus { border-color: var(--accent); }
 /* ============ Font Picker ============ */
 .font-picker {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
 .font-btn {
@@ -677,6 +685,58 @@ input[type="text"]:focus { border-color: var(--accent); }
   letter-spacing: 0.02em;
 }
 .card-font-handwrite .card-content > p { line-height: 1.95; }
+.card-font-huiwen .card-content,
+.card-font-huiwen .card-content > * {
+  font-family: 'Huiwen-mincho', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif;
+  letter-spacing: 0.03em;
+}
+.card-font-huiwen .card-content > p { line-height: 1.92; }
+.card-font-xique .card-content,
+.card-font-xique .card-content > * {
+  font-family: 'XiQueZaiShanLin', 'Ma Shan Zheng', 'STKaiti', 'KaiTi', cursive;
+  letter-spacing: 0.02em;
+}
+.card-font-xique .card-content > p { line-height: 1.78; }
+
+/* —— 头像区域（所有主题默认小图横排，noir 主题通过 CSS 放大） —— */
+.card-avatar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: absolute;
+  top: 80px;
+  left: 80px;
+  z-index: 2;
+}
+.card-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+.card-avatar-name {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* noir 主题：大号竖排头像 */
+.card-noir .card-avatar-wrap {
+  display: block;
+  top: 96px;
+  left: 96px;
+}
+.card-noir .card-avatar {
+  width: 120px;
+  height: 120px;
+}
+.card-noir .card-avatar-name {
+  font-size: 36px;
+  font-weight: 400;
+  margin-top: 18px;
+}
 
 /* —— 标签 pill：左下角 —— */
 .card-tag {
@@ -814,7 +874,6 @@ input[type="text"]:focus { border-color: var(--accent); }
   top: 280px;
 }
 .card-cover .cover-title {
-  font-family: var(--font-serif);
   font-weight: 800;
   font-size: 120px;
   line-height: 1.14;
@@ -1317,7 +1376,6 @@ input[type="text"]:focus { border-color: var(--accent); }
 
 /* 内嵌封面大标题 — 仿图：宋体超粗 + 黑色短分割线 */
 .card-editorial .card-content > h1.cover-title-inline {
-  font-family: var(--font-serif);
   font-size: 108px;
   font-weight: 900;
   line-height: 1.18;
@@ -1401,6 +1459,196 @@ input[type="text"]:focus { border-color: var(--accent); }
   box-shadow: 0 7px 0 rgba(26,20,16,0.55), 0 14px 0 rgba(26,20,16,0.40), 0 21px 0 rgba(26,20,16,0.28);
 }
 
+/* ==========================================================
+   主题 13：紫夜
+   • 灵感：深夜独读的文艺感，复古铅字印刷 × 黑紫配色
+   • 纯黑背景 + 浅紫文字 + 汇文明朝体默认
+   • 微光星尘 + 细线装饰，静谧而优雅
+   ========================================================== */
+.card-violet {
+  background: #0a0a0a;
+  color: #c9b8e0;
+  font-family: 'Huiwen-mincho', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif;
+  font-size: 42px;
+  line-height: 1.88;
+  font-weight: 400;
+  --card-tag-bg: rgba(201,184,224,0.12);
+  --card-tag-fg: #c9b8e0;
+  --card-tag-border: rgba(201,184,224,0.35);
+}
+.card-violet .card-deco {
+  background-image:
+    radial-gradient(1.2px 1.2px at 18% 12%, rgba(201,184,224,0.55), transparent 100%),
+    radial-gradient(1.0px 1.0px at 32% 22%, rgba(201,184,224,0.35), transparent 100%),
+    radial-gradient(1.2px 1.2px at 76% 16%, rgba(201,184,224,0.50), transparent 100%),
+    radial-gradient(1.0px 1.0px at 88% 38%, rgba(201,184,224,0.30), transparent 100%),
+    radial-gradient(1.0px 1.0px at 42% 82%, rgba(201,184,224,0.45), transparent 100%),
+    radial-gradient(1.2px 1.2px at 62% 92%, rgba(201,184,224,0.35), transparent 100%);
+}
+.card-violet .card-deco::before {
+  /* 顶部极细紫线 */
+  content: ''; position: absolute; left: 96px; right: 96px; top: 172px; height: 1px;
+  background: rgba(201,184,224,0.25);
+}
+.card-violet .card-deco::after {
+  /* 底部极细紫线 */
+  content: ''; position: absolute; left: 96px; right: 96px; bottom: 132px; height: 1px;
+  background: rgba(201,184,224,0.25);
+}
+.card-violet .card-stamp {
+  background: transparent;
+  color: #c9b8e0;
+  border: 1.5px solid rgba(201,184,224,0.35);
+  backdrop-filter: blur(6px);
+}
+.card-violet .card-stamp-dot { background: #a98be0; }
+.card-violet .card-page {
+  color: rgba(201,184,224,0.45);
+  font-family: 'Huiwen-mincho', 'Noto Serif SC', serif;
+}
+.card-violet .cover-title {
+  color: #e0d4f0;
+  font-weight: 700;
+  font-size: 108px;
+  letter-spacing: 0.02em;
+  line-height: 1.18;
+}
+.card-violet .card-content > p {
+  margin: 0 0 30px;
+  font-size: 42px;
+  line-height: 1.88;
+  color: var(--card-text-color, #c9b8e0);
+  font-weight: 400;
+}
+.card-violet .card-content > p:last-child { margin-bottom: 0; }
+.card-violet .card-content > h1,
+.card-violet .card-content > h2,
+.card-violet .card-content > h3 {
+  font-family: 'Huiwen-mincho', 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 64px;
+  line-height: 1.28;
+  letter-spacing: 0.01em;
+  margin: 0 0 22px;
+  color: #e0d4f0;
+}
+.card-violet .card-content > blockquote {
+  margin: 24px 0;
+  padding: 20px 28px;
+  border-left: 3px solid rgba(201,184,224,0.55);
+  background: rgba(201,184,224,0.06);
+  font-style: italic;
+  opacity: 1;
+}
+.card-violet .card-content > ul,
+.card-violet .card-content > ol { margin: 0 0 24px; }
+.card-violet .card-content > ul li,
+.card-violet .card-content > ol li { margin-bottom: 14px; }
+
+/* 缩略图 */
+.theme-violet {
+  background: #0a0a0a;
+  border: 1px solid rgba(201,184,224,0.20);
+  position: relative;
+}
+.theme-violet::before {
+  content: ''; position: absolute; left: 6px; right: 6px; top: 10px; height: 1px;
+  background: rgba(201,184,224,0.35);
+}
+.theme-violet::after {
+  content: ''; position: absolute; left: 8px; top: 22px;
+  width: 36px; height: 2px; border-radius: 1px;
+  background: rgba(201,184,224,0.50);
+  box-shadow: 0 6px 0 rgba(201,184,224,0.40), 0 12px 0 rgba(201,184,224,0.30), 0 18px 0 rgba(201,184,224,0.20);
+}
+
+/* ==========================================================
+   主题 14：墨紫
+   • 灵感：小红书 GOGA 风格卡片
+   • 纯黑背景 + 淡紫文字 + 头像区域
+   ========================================================== */
+.card-noir {
+  background: #000000;
+  color: #d2c1de;
+  font-family: var(--font-sans);
+  font-size: 44px;
+  line-height: 1.78;
+  font-weight: 400;
+  --card-tag-bg: rgba(210,193,222,0.12);
+  --card-tag-fg: #d2c1de;
+  --card-tag-border: rgba(210,193,222,0.35);
+}
+.card-noir .card-deco {
+  background-image:
+    radial-gradient(1.0px 1.0px at 22% 18%, rgba(210,193,222,0.45), transparent 100%),
+    radial-gradient(0.8px 0.8px at 78% 12%, rgba(210,193,222,0.30), transparent 100%),
+    radial-gradient(1.0px 1.0px at 65% 85%, rgba(210,193,222,0.35), transparent 100%);
+}
+.card-noir .card-avatar-name { color: #d2c1de; }
+.card-noir .card-page {
+  top: 80px;
+  right: 90px;
+  bottom: auto;
+  color: rgba(210,193,222,0.55);
+}
+.card-noir .card-content {
+  top: 340px;
+}
+.card-noir .card-content > p {
+  margin: 0 0 28px;
+  font-size: 44px;
+  line-height: 1.78;
+  color: var(--card-text-color, #d2c1de);
+}
+.card-noir .card-content > p:last-child { margin-bottom: 0; }
+.card-noir .cover-title {
+  color: #e8d8f0;
+  font-weight: 400;
+  font-size: 120px;
+  letter-spacing: 0.02em;
+  line-height: 1.12;
+}
+.card-noir .card-content > h1,
+.card-noir .card-content > h2,
+.card-noir .card-content > h3 {
+  font-weight: 400;
+  font-size: 68px;
+  line-height: 1.22;
+  letter-spacing: 0.02em;
+  margin: 0 0 24px;
+  color: #e8d8f0;
+}
+.card-noir .card-content > blockquote {
+  margin: 24px 0;
+  padding: 18px 28px;
+  border-left: 4px solid rgba(210,193,222,0.55);
+  background: rgba(210,193,222,0.05);
+  font-style: normal;
+  opacity: 1;
+}
+.card-noir .card-content > ul,
+.card-noir .card-content > ol { margin: 0 0 24px; }
+.card-noir .card-content > ul li,
+.card-noir .card-content > ol li { margin-bottom: 14px; }
+
+/* 缩略图 */
+.theme-noir {
+  background: #000000;
+  border: 1px solid rgba(210,193,222,0.25);
+  position: relative;
+}
+.theme-noir::before {
+  content: ''; position: absolute; left: 8px; top: 8px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: rgba(210,193,222,0.50);
+}
+.theme-noir::after {
+  content: ''; position: absolute; left: 8px; top: 28px;
+  width: 36px; height: 2px; border-radius: 1px;
+  background: rgba(210,193,222,0.50);
+  box-shadow: 0 6px 0 rgba(210,193,222,0.40), 0 12px 0 rgba(210,193,222,0.30), 0 18px 0 rgba(210,193,222,0.20);
+}
+
 /* —— 富文本内 inline 元素全部生效 —— */
 .card-content strong, .card-content b { font-weight: 700; }
 .card-content em, .card-content i { font-style: italic; }
@@ -1409,7 +1657,6 @@ input[type="text"]:focus { border-color: var(--accent); }
 
 /* —— 内嵌封面标题：第 1 张卡顶部大字 + 主题色下划线 —— */
 .card-content > h1.cover-title-inline {
-  font-family: var(--font-serif);
   font-weight: 900;
   font-size: 112px;
   line-height: 1.16;
@@ -1440,6 +1687,8 @@ input[type="text"]:focus { border-color: var(--accent); }
 .card-neon { --card-accent: #ff4d8d; --card-tag-bg: rgba(255,77,141,0.12); --card-tag-fg: #ff4d8d; --card-tag-border: #ff4d8d; }
 .card-classical { --card-accent: #b03020; --card-tag-bg: rgba(176,48,32,0.10); --card-tag-fg: #b03020; --card-tag-border: rgba(176,48,32,0.40); }
 .card-editorial { --card-accent: #b8956a; }
+.card-violet { --card-accent: #c9b8e0; --card-tag-bg: rgba(201,184,224,0.12); --card-tag-fg: #c9b8e0; --card-tag-border: rgba(201,184,224,0.35); }
+.card-noir { --card-accent: #d2c1de; --card-tag-bg: rgba(210,193,222,0.12); --card-tag-fg: #d2c1de; --card-tag-border: rgba(210,193,222,0.35); }
 
 /* 杂志主题：标题极重，黑底色 */
 .card-magazine .card-content > h1.cover-title-inline {
