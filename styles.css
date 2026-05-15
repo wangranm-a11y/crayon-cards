@@ -674,25 +674,30 @@ input[type="text"]:focus { border-color: var(--accent); }
   --card-tag-border: rgba(0,0,0,0.10);
 }
 
-/* —— 字体选择（覆盖卡片正文区字体） —— */
+/* —— 字体选择（覆盖卡片正文区 + 左上角昵称字体） —— */
 .card-font-serif .card-content,
-.card-font-serif .card-content > * { font-family: var(--font-serif); }
+.card-font-serif .card-content > *,
+.card-font-serif .card-avatar-name { font-family: var(--font-serif); }
 .card-font-sans .card-content,
-.card-font-sans .card-content > * { font-family: var(--font-sans); }
+.card-font-sans .card-content > *,
+.card-font-sans .card-avatar-name { font-family: var(--font-sans); }
 .card-font-handwrite .card-content,
-.card-font-handwrite .card-content > * {
+.card-font-handwrite .card-content > *,
+.card-font-handwrite .card-avatar-name {
   font-family: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', 'Kaiti SC', cursive;
   letter-spacing: 0.02em;
 }
 .card-font-handwrite .card-content > p { line-height: 1.95; }
 .card-font-huiwen .card-content,
-.card-font-huiwen .card-content > * {
+.card-font-huiwen .card-content > *,
+.card-font-huiwen .card-avatar-name {
   font-family: 'Huiwen-mincho', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif;
   letter-spacing: 0.03em;
 }
 .card-font-huiwen .card-content > p { line-height: 1.92; }
 .card-font-xique .card-content,
-.card-font-xique .card-content > * {
+.card-font-xique .card-content > *,
+.card-font-xique .card-avatar-name {
   font-family: 'XiQueZaiShanLin', 'Ma Shan Zheng', 'STKaiti', 'KaiTi', cursive;
   letter-spacing: 0.02em;
 }
@@ -702,22 +707,22 @@ input[type="text"]:focus { border-color: var(--accent); }
 .card-avatar-wrap {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   position: absolute;
-  top: 80px;
+  top: 72px;
   left: 80px;
   z-index: 2;
 }
 .card-avatar {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   object-fit: cover;
   display: block;
 }
 .card-avatar-name {
-  font-family: var(--font-sans);
-  font-size: 24px;
+  font-family: inherit;
+  font-size: 30px;
   font-weight: 600;
   letter-spacing: 0.04em;
 }
