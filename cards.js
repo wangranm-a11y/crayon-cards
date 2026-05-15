@@ -13,7 +13,7 @@ window.CARDS = (function () {
   const THEMES = {
     cream: {
       name: '米色信笺',
-      previewBg: 'linear-gradient(180deg, #fbf6e9, #f0e8d0)',
+      previewBg: '#fbf6e9',
     },
     indigo: {
       name: '暗夜诗笺',
