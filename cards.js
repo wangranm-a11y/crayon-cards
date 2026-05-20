@@ -160,7 +160,7 @@ window.CARDS = (function () {
     function tryFit(htmlToAdd) {
       content.innerHTML = buffer.join('') + htmlToAdd;
       // contentHeight vs containerHeight
-      return content.scrollHeight <= content.clientHeight + 2; // 2px 容差
+      return content.scrollHeight <= content.clientHeight - 2; // -2px 防止底部文字被截断
     }
 
     // 行内格式标签（不当作断点）；其他元素子（如 <li>/<p>/<div>）算天然断点
@@ -237,55 +237,49 @@ window.CARDS = (function () {
       if (tokens.length === 0) return { fitted: false, remainder: block };
 
       let fittedHTML = '';
-      let lastCutHTML = '';        // 已 commit 的最近"好切点"
-      let lastCutTokenIdx = -1;    // 该切点对应的 token 索引
-      let charSplitRemainder = ''; // 文本 token 被字符级切开后剩的部分
+      let remainderParts = [];     // 累积所有被切剩下的 token 片段
 
       for (let i = 0; i < tokens.length; i++) {
         const cloneEl = block.cloneNode(false);
         cloneEl.innerHTML = fittedHTML + tokens[i].html;
         if (tryFit(cloneEl.outerHTML)) {
           fittedHTML += tokens[i].html;
-          if (tokens[i].endsAtBoundary) {
-            lastCutHTML = fittedHTML;
-            lastCutTokenIdx = i;
-            charSplitRemainder = '';
-          }
         } else {
           // 当前 token 整段塞不下；如果是文本，按字符再榨一榨
           if (tokens[i].type === 'text' && tokens[i].text.length > 1) {
             const maxChars = findMaxCharsFit(block, fittedHTML, tokens[i].text);
             if (maxChars > 0) {
               fittedHTML += escapeHtml(tokens[i].text.slice(0, maxChars));
-              lastCutHTML = fittedHTML;
-              lastCutTokenIdx = i;
-              charSplitRemainder = tokens[i].text.slice(maxChars);
+              const leftover = tokens[i].text.slice(maxChars);
+              if (leftover) remainderParts.push(escapeHtml(leftover));
+              // 不 break，继续尝试后续 token 填满剩余空间
+              continue;
             }
+          }
+          // 真的连一个字都塞不下 → 把当前及后续 token 全放进余量
+          remainderParts.push(tokens[i].html);
+          for (let j = i + 1; j < tokens.length; j++) {
+            remainderParts.push(tokens[j].html);
           }
           break;
         }
       }
 
-      if (lastCutTokenIdx < 0) {
+      if (!fittedHTML.trim()) {
         // 连一个字都塞不下 → 让外层处理
         return { fitted: false, remainder: block };
       }
 
       // 把可填的部分推入当前卡
       const fittedEl = block.cloneNode(false);
-      fittedEl.innerHTML = lastCutHTML;
+      fittedEl.innerHTML = fittedHTML;
       buffer.push(fittedEl.outerHTML);
 
-      // 组装 remainder（字符切剩下的尾巴 + 后续 tokens）
-      let remainderHTML = charSplitRemainder ? escapeHtml(charSplitRemainder) : '';
-      for (let j = lastCutTokenIdx + 1; j < tokens.length; j++) {
-        remainderHTML += tokens[j].html;
-      }
-      if (!remainderHTML.replace(/\s/g, '')) {
+      if (remainderParts.length === 0) {
         return { fitted: true, remainder: null };
       }
       const remainder = block.cloneNode(false);
-      remainder.innerHTML = remainderHTML;
+      remainder.innerHTML = remainderParts.join('');
       return { fitted: true, remainder };
     }
 
@@ -414,7 +408,7 @@ window.CARDS = (function () {
     for (const s of sentences) {
       const tryHTML = `<${tagName.toLowerCase()}>${escapeHtml(current + s)}</${tagName.toLowerCase()}>`;
       fitContainer.innerHTML = tryHTML;
-      if (fitContainer.scrollHeight <= fitContainer.clientHeight + 2) {
+      if (fitContainer.scrollHeight <= fitContainer.clientHeight - 2) {
         current += s;
       } else {
         if (current) {
@@ -440,7 +434,7 @@ window.CARDS = (function () {
         const el = document.createElement(tagName);
         el.textContent = test;
         fitContainer.innerHTML = el.outerHTML;
-        if (fitContainer.scrollHeight <= fitContainer.clientHeight + 2) {
+        if (fitContainer.scrollHeight <= fitContainer.clientHeight - 2) {
           chunk = test;
         } else {
           if (chunk) {

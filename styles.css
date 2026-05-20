@@ -1393,7 +1393,7 @@ input[type="text"]:focus { border-color: var(--accent); }
   line-height: 1.18;
 }
 .card-violet .card-content > p {
-  margin: 0 0 30px;
+  margin: 0 0 28px;
   font-size: 42px;
   line-height: 1.88;
   color: var(--card-text-color, #c9b8e0);

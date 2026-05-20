@@ -535,6 +535,13 @@
       n.replaceWith(div);
     });
 
+    // 把外部粘贴的标题（h1-h6）转为 p，统一字号，保留内部加粗/斜体等格式
+    wrap.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(n => {
+      const p = document.createElement('p');
+      p.innerHTML = n.innerHTML;
+      n.replaceWith(p);
+    });
+
     // 清理元素属性（仅保留允许的）
     const allowedAttrs = {
       A: ['href'],
