@@ -160,7 +160,7 @@ window.CARDS = (function () {
     function tryFit(htmlToAdd) {
       content.innerHTML = buffer.join('') + htmlToAdd;
       // contentHeight vs containerHeight
-      return content.scrollHeight <= content.clientHeight - 2; // -2px 防止底部文字被截断
+      return content.scrollHeight <= content.clientHeight;
     }
 
     // 行内格式标签（不当作断点）；其他元素子（如 <li>/<p>/<div>）算天然断点
@@ -285,10 +285,20 @@ window.CARDS = (function () {
 
     // 用队列处理：remainder 会被 unshift 回去，下一轮在新卡上继续填
     const queue = blocks.slice();
+    let stallCount = 0;  // 防无限循环
 
     while (queue.length > 0) {
       const block = queue.shift();
       const html = block.outerHTML;
+
+      // 安全阀：同一个块反复塞不下时直接提交当前页
+      if (stallCount > 50) {
+        if (buffer.length) commit();
+        buffer.push(html);
+        commit();
+        stallCount = 0;
+        continue;
+      }
 
       // 1) 整块能塞进当前卡 → 直接塞
       if (tryFit(html)) {
@@ -324,6 +334,13 @@ window.CARDS = (function () {
 
       // 5) 句级也搞不定（无句号的极长一句 / 图片） → 走兜底拆块
       const subBlocks = splitOneBlock(block, content);
+      if (subBlocks.length === 0) {
+        // 完全拆不开，直接整块塞一页
+        buffer.push(html);
+        commit();
+        continue;
+      }
+      stallCount++;
       // 反向 unshift，保持顺序
       for (let i = subBlocks.length - 1; i >= 0; i--) {
         queue.unshift(subBlocks[i]);
@@ -408,7 +425,7 @@ window.CARDS = (function () {
     for (const s of sentences) {
       const tryHTML = `<${tagName.toLowerCase()}>${escapeHtml(current + s)}</${tagName.toLowerCase()}>`;
       fitContainer.innerHTML = tryHTML;
-      if (fitContainer.scrollHeight <= fitContainer.clientHeight - 2) {
+      if (fitContainer.scrollHeight <= fitContainer.clientHeight) {
         current += s;
       } else {
         if (current) {
@@ -434,7 +451,7 @@ window.CARDS = (function () {
         const el = document.createElement(tagName);
         el.textContent = test;
         fitContainer.innerHTML = el.outerHTML;
-        if (fitContainer.scrollHeight <= fitContainer.clientHeight - 2) {
+        if (fitContainer.scrollHeight <= fitContainer.clientHeight) {
           chunk = test;
         } else {
           if (chunk) {

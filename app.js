@@ -678,7 +678,18 @@
     }
 
     // 2. 拆页
-    const pages = window.CARDS.splitIntoPages(workEditor, state.theme, totalOpts);
+    let pages;
+    try {
+      pages = window.CARDS.splitIntoPages(workEditor, state.theme, totalOpts);
+    } catch (e) {
+      console.error('splitIntoPages error:', e);
+      list.innerHTML = '<p style="text-align:center;color:#c84b31;">拼版失败：' + e.message + '</p><p style="text-align:center;color:#a89e8a;font-size:13px;">请尝试缩短内容或更换主题</p>';
+      return;
+    }
+    if (!pages || pages.length === 0) {
+      list.innerHTML = '<p style="text-align:center;color:#a89e8a;">未能生成卡片，请检查内容后重试</p>';
+      return;
+    }
 
     // 3. 直接渲染每张内容卡（不再有单独的 cover 页）
     const allItems = pages.map(p => ({ type: 'content', html: p.contentHTML }));
