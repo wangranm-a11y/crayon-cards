@@ -535,10 +535,36 @@ window.CARDS = (function () {
     }
 
     // 2c. 修复头像黑边：html2canvas 对 border-radius 裁剪不准，
-    //     加 clip-path 确保圆形裁剪
-    clone.querySelectorAll('.card-avatar').forEach(av => {
-      av.style.clipPath = 'circle(50%)';
-    });
+    //     直接把头像画到 canvas 裁成圆形替换，彻底解决
+    await Promise.all(
+      Array.from(clone.querySelectorAll('.card-avatar')).map(async (av) => {
+        try {
+          // 确保图片已加载
+          if (!av.complete) {
+            await new Promise(r => { av.onload = r; av.onerror = r; });
+          }
+          const w = av.naturalWidth, h = av.naturalHeight;
+          if (!w || !h) return;
+          const size = 2 * Math.max(av.offsetWidth || 88, av.offsetHeight || 88);
+          const half = size / 2;
+          const c = document.createElement('canvas');
+          c.width = size; c.height = size;
+          const ctx = c.getContext('2d');
+          // 画圆形裁剪
+          ctx.beginPath();
+          ctx.arc(half, half, half, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+          // cover 模式缩放
+          const scale = Math.max(size / w, size / h);
+          const sw = size / scale, sh = size / scale;
+          ctx.drawImage(av, (w - sw) / 2, (h - sh) / 2, sw, sh, 0, 0, size, size);
+          av.src = c.toDataURL('image/png');
+          av.style.borderRadius = '0';
+          av.style.objectFit = 'fill';
+        } catch (_) { /* 失败不阻塞 */ }
+      })
+    );
 
     // 3. 等所有内嵌图片加载完
     await Promise.all(
