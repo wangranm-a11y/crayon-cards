@@ -301,7 +301,15 @@ window.CARDS = (function () {
       }
 
       // 1) 整块能塞进当前卡 → 直接塞
-      if (tryFit(html)) {
+      //    但对图片块：若 buffer 为空，跳过 tryFit 直接缩放（省一次 innerHTML）
+      if (buffer.length === 0 && blockHasImage(block)) {
+        // 空卡 + 图片 → 直接缩放，不浪费 tryFit
+        const scaled = scaleImageToFit(block, content, '');
+        if (scaled) {
+          buffer.push(scaled.outerHTML);
+          continue;
+        }
+      } else if (tryFit(html)) {
         buffer.push(html);
         continue;
       }
@@ -441,10 +449,15 @@ window.CARDS = (function () {
     }
     if (!imgEl) return null;
 
-    // 1. 测已用高度 — 只做 1 次 innerHTML
-    contentEl.innerHTML = existingHTML;
-    const usedHeight = contentEl.scrollHeight;
+    // 1. 计算可用高度 — 空 buffer 时免测 innerHTML
     const totalAvailable = contentEl.clientHeight;
+    let usedHeight;
+    if (existingHTML === '') {
+      usedHeight = 0; // 空页，无需 innerHTML 测量
+    } else {
+      contentEl.innerHTML = existingHTML;
+      usedHeight = contentEl.scrollHeight;
+    }
     // 15% 安全边距吸收 CSS margin/padding/伪元素偏差
     const maxH = Math.floor((totalAvailable - usedHeight) * 0.85);
 
