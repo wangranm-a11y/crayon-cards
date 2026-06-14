@@ -522,6 +522,17 @@ window.CARDS = (function () {
     `;
     document.body.appendChild(clone);
 
+    // 2b. 把百分比 max-height 转为像素值，html2canvas 才能正确渲染
+    const contentEl = clone.querySelector('.card-content');
+    if (contentEl) {
+      const ch = contentEl.clientHeight;
+      clone.querySelectorAll('img').forEach(img => {
+        const pct = parseFloat(img.style.maxHeight);
+        if (!isNaN(pct)) { img.style.maxHeight = Math.floor(ch * pct / 100) + 'px'; }
+        else { img.style.maxHeight = Math.floor(ch * 0.72) + 'px'; }
+      });
+    }
+
     // 3. 等所有内嵌图片加载完
     await Promise.all(
       Array.from(clone.querySelectorAll('img')).map(img => {
