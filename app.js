@@ -700,10 +700,24 @@
       h1.textContent = state.title;
       workEditor.insertBefore(h1, workEditor.firstChild);
 
-      // 提取首张图片放到封面页，正文不含标题和首图
+      // 判断首图是否在文章最开头（前面没有正文），是才放封面
       const firstImg = workEditor.querySelector('img');
+      let imgAtStart = false;
       if (firstImg) {
-        // 封面 = 标题 + 首图
+        imgAtStart = true;
+        let sib = h1.nextSibling;
+        while (sib) {
+          if (sib === firstImg || sib.contains(firstImg)) break; // 找到图，前面无正文
+          const t = sib.textContent || '';
+          if (sib.nodeType === Node.TEXT_NODE ? t.trim() : (sib.tagName !== 'BR' && t.trim())) {
+            imgAtStart = false; break; // 图前有正文
+          }
+          sib = sib.nextSibling;
+        }
+      }
+
+      if (firstImg && imgAtStart) {
+        // 首图在最开头 → 提取到封面
         coverHTML = h1.outerHTML + firstImg.outerHTML;
         const parent = firstImg.parentNode;
         firstImg.remove();
@@ -711,6 +725,7 @@
           parent.remove();
         }
       } else {
+        // 无图或图不在开头 → 封面只有标题
         coverHTML = h1.outerHTML;
       }
       // 从正文编辑器中移除标题（已在封面页上了）
