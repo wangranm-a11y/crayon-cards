@@ -322,6 +322,8 @@ window.CARDS = (function () {
             commit();
             continue;
           }
+          // 缩放失败 → 把图片放回队列，等下一页再处理
+          queue.unshift(block);
         }
         // 一句都塞不下 → 提交当前卡，下一轮在空卡上重试
         commit();
@@ -439,69 +441,136 @@ window.CARDS = (function () {
     }
     if (!imgEl) return null;
 
+    // 辅助：把内容塞进 contentEl 并判断是否 fit
+    function checkFit(inner) {
+      contentEl.innerHTML = inner;
+      return contentEl.scrollHeight <= contentEl.clientHeight;
+    }
+
     // 1. 测量已占用高度
+    const totalAvailable = contentEl.clientHeight;
     contentEl.innerHTML = existingHTML;
     const usedHeight = contentEl.scrollHeight;
-    const totalAvailable = contentEl.clientHeight;
-    // 留 8% 安全边距，确保图片放得下
-    const safeMargin = 0.92;
+    // 留 15% 安全边距，抵消 CSS margin/padding/伪元素等不可预见因素
+    const safeMargin = 0.85;
     const availableForImage = Math.floor((totalAvailable - usedHeight) * safeMargin);
 
-    if (availableForImage < 80) return null; // 空间太小，不值得缩放
+    if (availableForImage < 60) return null; // 空间太小
 
     // 2. 测量图片自然渲染高度（去掉所有尺寸限制）
     const testImg = imgEl.cloneNode(true);
+    testImg.removeAttribute('width');
+    testImg.removeAttribute('height');
     testImg.style.maxHeight = 'none';
     testImg.style.maxWidth = '100%';
     testImg.style.height = 'auto';
     testImg.style.width = 'auto';
     testImg.style.objectFit = 'none';
 
+    let testHTML;
     if (wrapperTag) {
       const wrapper = document.createElement(wrapperTag.toLowerCase());
       wrapper.appendChild(testImg);
-      contentEl.innerHTML = existingHTML + wrapper.outerHTML;
+      testHTML = wrapper.outerHTML;
     } else {
-      contentEl.innerHTML = existingHTML + testImg.outerHTML;
+      testHTML = testImg.outerHTML;
     }
+
+    contentEl.innerHTML = existingHTML + testHTML;
     const fullHeight = contentEl.scrollHeight;
     const imageNaturalHeight = fullHeight - usedHeight;
 
-    // 3. 图像自然高度 ≤ 可用空间 → 无需缩放
-    if (imageNaturalHeight <= availableForImage) return null;
+    // 如果自然高度已经在可用范围内，给图片设 max-height 为可用高度即可
+    // （不返回 null —— tryFit 失败了说明有其他因素，直接设 max-height 最安全）
+    let targetMaxH;
+    if (imageNaturalHeight <= availableForImage) {
+      targetMaxH = availableForImage;
+    } else {
+      // 3. 二分查找最佳 max-height
+      let lo = 60, hi = availableForImage, best = 60;
+      while (lo <= hi) {
+        const mid = (lo + hi) >> 1;
+        const tryImg = imgEl.cloneNode(true);
+        tryImg.removeAttribute('width');
+        tryImg.removeAttribute('height');
+        tryImg.style.maxHeight = mid + 'px';
+        tryImg.style.maxWidth = '100%';
+        tryImg.style.height = 'auto';
+        tryImg.style.width = 'auto';
+        tryImg.style.objectFit = 'contain';
 
-    // 4. 二分查找最佳 max-height（精确到像素）
-    let lo = 80, hi = availableForImage, best = 80;
-    while (lo <= hi) {
-      const mid = (lo + hi) >> 1;
-      const tryImg = imgEl.cloneNode(true);
-      tryImg.style.maxHeight = mid + 'px';
-      tryImg.style.maxWidth = '100%';
-      tryImg.style.height = 'auto';
-      tryImg.style.width = 'auto';
-      tryImg.style.objectFit = 'contain';
+        let tryHTML;
+        if (wrapperTag) {
+          const wrapper = document.createElement(wrapperTag.toLowerCase());
+          wrapper.appendChild(tryImg);
+          tryHTML = wrapper.outerHTML;
+        } else {
+          tryHTML = tryImg.outerHTML;
+        }
 
-      if (wrapperTag) {
-        const wrapper = document.createElement(wrapperTag.toLowerCase());
-        wrapper.appendChild(tryImg);
-        contentEl.innerHTML = existingHTML + wrapper.outerHTML;
-      } else {
-        contentEl.innerHTML = existingHTML + tryImg.outerHTML;
+        if (checkFit(existingHTML + tryHTML)) {
+          best = mid;
+          lo = mid + 1;
+        } else {
+          hi = mid - 1;
+        }
       }
-
-      if (contentEl.scrollHeight <= contentEl.clientHeight) {
-        best = mid;
-        lo = mid + 1;
-      } else {
-        hi = mid - 1;
-      }
+      targetMaxH = best;
     }
 
-    // 5. 构建缩放结果
+    // 4. 最终验证：用选定的 max-height 再检查一次
+    const finalImg = imgEl.cloneNode(true);
+    finalImg.removeAttribute('width');
+    finalImg.removeAttribute('height');
+    finalImg.style.maxHeight = targetMaxH + 'px';
+    finalImg.style.maxWidth = '100%';
+    finalImg.style.height = 'auto';
+    finalImg.style.width = 'auto';
+    finalImg.style.objectFit = 'contain';
+
+    let finalHTML;
+    if (wrapperTag) {
+      const wrapper = document.createElement(wrapperTag.toLowerCase());
+      wrapper.appendChild(finalImg);
+      finalHTML = wrapper.outerHTML;
+    } else {
+      finalHTML = finalImg.outerHTML;
+    }
+
+    if (!checkFit(existingHTML + finalHTML)) {
+      // 仍然塞不下 → 每轮减 10% 重试（最多 5 轮）
+      for (let round = 0; round < 5 && targetMaxH > 50; round++) {
+        targetMaxH = Math.floor(targetMaxH * 0.9);
+        const retryImg = imgEl.cloneNode(true);
+        retryImg.removeAttribute('width');
+        retryImg.removeAttribute('height');
+        retryImg.style.maxHeight = targetMaxH + 'px';
+        retryImg.style.maxWidth = '100%';
+        retryImg.style.height = 'auto';
+        retryImg.style.width = 'auto';
+        retryImg.style.objectFit = 'contain';
+
+        let retryHTML;
+        if (wrapperTag) {
+          const wrapper = document.createElement(wrapperTag.toLowerCase());
+          wrapper.appendChild(retryImg);
+          retryHTML = wrapper.outerHTML;
+        } else {
+          retryHTML = retryImg.outerHTML;
+        }
+
+        if (checkFit(existingHTML + retryHTML)) break;
+      }
+      if (targetMaxH < 50) return null; // 彻底塞不下
+    }
+
+    // 5. 构建最终结果
     if (wrapperTag) {
       const result = document.createElement(wrapperTag.toLowerCase());
       const scaledImg = imgEl.cloneNode(true);
-      scaledImg.style.maxHeight = best + 'px';
+      scaledImg.removeAttribute('width');
+      scaledImg.removeAttribute('height');
+      scaledImg.style.maxHeight = targetMaxH + 'px';
       scaledImg.style.maxWidth = '100%';
       scaledImg.style.height = 'auto';
       scaledImg.style.width = 'auto';
@@ -510,7 +579,9 @@ window.CARDS = (function () {
       return result;
     } else {
       const result = imgEl.cloneNode(true);
-      result.style.maxHeight = best + 'px';
+      result.removeAttribute('width');
+      result.removeAttribute('height');
+      result.style.maxHeight = targetMaxH + 'px';
       result.style.maxWidth = '100%';
       result.style.height = 'auto';
       result.style.width = 'auto';
