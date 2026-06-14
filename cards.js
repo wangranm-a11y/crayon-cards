@@ -534,6 +534,12 @@ window.CARDS = (function () {
       });
     }
 
+    // 2c. 修复头像黑边：html2canvas 对 border-radius 裁剪不准，
+    //     加 clip-path 确保圆形裁剪
+    clone.querySelectorAll('.card-avatar').forEach(av => {
+      av.style.clipPath = 'circle(50%)';
+    });
+
     // 3. 等所有内嵌图片加载完
     await Promise.all(
       Array.from(clone.querySelectorAll('img')).map(img => {
