@@ -301,15 +301,7 @@ window.CARDS = (function () {
       }
 
       // 1) 整块能塞进当前卡 → 直接塞
-      //    但对图片块：若 buffer 为空，跳过 tryFit 直接缩放（省一次 innerHTML）
-      if (buffer.length === 0 && blockHasImage(block)) {
-        // 空卡 + 图片 → 直接缩放，不浪费 tryFit
-        const scaled = scaleImageToFit(block, content, '');
-        if (scaled) {
-          buffer.push(scaled.outerHTML);
-          continue;
-        }
-      } else if (tryFit(html)) {
+      if (tryFit(html)) {
         buffer.push(html);
         continue;
       }
@@ -321,17 +313,6 @@ window.CARDS = (function () {
           commit();
           if (r.remainder) queue.unshift(r.remainder);
           continue;
-        }
-        // 图片/含图块：尝试智能缩放以适配剩余空间（封面页必须留住图片）
-        if (blockHasImage(block)) {
-          const scaled = scaleImageToFit(block, content, buffer.join(''));
-          if (scaled) {
-            buffer.push(scaled.outerHTML);
-            commit();
-            continue;
-          }
-          // 缩放失败 → 把图片放回队列，等下一页再处理
-          queue.unshift(block);
         }
         // 一句都塞不下 → 提交当前卡，下一轮在空卡上重试
         commit();
@@ -349,15 +330,6 @@ window.CARDS = (function () {
         commit();
         if (r2.remainder) queue.unshift(r2.remainder);
         continue;
-      }
-
-      // 4b) 图片/含图块：空卡也装不下 → 智能缩放到整页可用高度
-      if (blockHasImage(block)) {
-        const scaled = scaleImageToFit(block, content, '');
-        if (scaled) {
-          buffer.push(scaled.outerHTML);
-          continue;
-        }
       }
 
       // 5) 句级也搞不定（无句号的极长一句 / 图片） → 走兜底拆块
@@ -430,90 +402,13 @@ window.CARDS = (function () {
   }
 
   /**
-   * 智能缩放图片：按可用空间自动计算最佳 max-height
-   * 采用二分查找找到图片能完整显示的最大高度
-   * @param {HTMLElement} imgBlock — IMG 元素（独立或包裹在 p/div 中）
-   * @param {HTMLElement} contentEl — 测试卡的 .card-content 元素
-   * @param {string} existingHTML — 当前页已累积的 HTML 字符串
-   * @returns {HTMLElement|null} 缩放后的元素克隆，或 null 表示无需缩放/无法缩放
-   */
-  function scaleImageToFit(imgBlock, contentEl, existingHTML) {
-    // 提取实际的 IMG 元素
-    let imgEl, wrapperTag;
-    if (imgBlock.tagName === 'IMG') {
-      imgEl = imgBlock;
-      wrapperTag = null;
-    } else {
-      imgEl = imgBlock.querySelector('img');
-      wrapperTag = imgEl ? imgBlock.tagName : null;
-    }
-    if (!imgEl) return null;
-
-    // 1. 计算可用高度 — 空 buffer 时免测 innerHTML
-    const totalAvailable = contentEl.clientHeight;
-    let usedHeight;
-    if (existingHTML === '') {
-      usedHeight = 0; // 空页，无需 innerHTML 测量
-    } else {
-      contentEl.innerHTML = existingHTML;
-      usedHeight = contentEl.scrollHeight;
-    }
-    // 15% 安全边距吸收 CSS margin/padding/伪元素偏差
-    const maxH = Math.floor((totalAvailable - usedHeight) * 0.85);
-
-    if (maxH < 60) return null;
-
-    // 2. 直接设 max-height，object-fit:contain 自动等比缩放
-    //    无需二分查找 — 浏览器自己算比例，O(1) 完成
-    if (wrapperTag) {
-      const wrapper = document.createElement(wrapperTag.toLowerCase());
-      const scaledImg = imgEl.cloneNode(true);
-      scaledImg.removeAttribute('width');
-      scaledImg.removeAttribute('height');
-      scaledImg.style.maxHeight = maxH + 'px';
-      scaledImg.style.maxWidth = '100%';
-      scaledImg.style.height = 'auto';
-      scaledImg.style.width = 'auto';
-      scaledImg.style.objectFit = 'contain';
-      wrapper.appendChild(scaledImg);
-      return wrapper;
-    } else {
-      const result = imgEl.cloneNode(true);
-      result.removeAttribute('width');
-      result.removeAttribute('height');
-      result.style.maxHeight = maxH + 'px';
-      result.style.maxWidth = '100%';
-      result.style.height = 'auto';
-      result.style.width = 'auto';
-      result.style.objectFit = 'contain';
-      return result;
-    }
-  }
-
-  /**
-   * 检查块是否包含图片（独立 IMG 或内部包含 img）
-   */
-  function blockHasImage(block) {
-    if (block.tagName === 'IMG') return true;
-    return !!block.querySelector('img');
-  }
-
-  /**
    * 把单个塞不下的块按句/字符再拆
    */
   function splitOneBlock(block, fitContainer) {
     const tagName = block.tagName;
-    // 图片/含图块装不下 → 智能缩放
-    if (blockHasImage(block)) {
-      // 作为最后的兜底保险：用 60% 或缩放结果中较小的
-      const scaled = scaleImageToFit(block, fitContainer, '');
-      if (scaled) return [scaled];
-      // 如果 scaleImageToFit 也返回 null，用 60% 硬兜底
-      const fallbackH = Math.floor(fitContainer.clientHeight * 0.6);
-      block.style.maxHeight = Math.min(fallbackH, 800) + 'px';
-      block.style.maxWidth = '100%';
-      block.style.height = 'auto';
-      block.style.width = 'auto';
+    // 图片单独成块装不下 → 强行缩小
+    if (tagName === 'IMG') {
+      block.style.maxHeight = '60%';
       block.style.objectFit = 'contain';
       return [block];
     }
