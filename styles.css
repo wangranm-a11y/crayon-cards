@@ -883,7 +883,7 @@ input[type="text"]:focus { border-color: var(--accent); }
 /* 图片：用后代选择器，覆盖 contenteditable 把 <img> 包进 <p> 的情况 */
 .card-content img {
   max-width: 100%;
-  max-height: 74%;
+  max-height: 88%;
   width: auto;
   height: auto;
   border-radius: 8px;

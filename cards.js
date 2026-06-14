@@ -408,7 +408,7 @@ window.CARDS = (function () {
     const tagName = block.tagName;
     // 图片单独成块装不下 → 强行缩小
     if (tagName === 'IMG') {
-      block.style.maxHeight = '74%';
+      block.style.maxHeight = '65%';
       block.style.objectFit = 'contain';
       return [block];
     }
