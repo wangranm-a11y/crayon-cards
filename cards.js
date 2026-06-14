@@ -511,51 +511,78 @@ window.CARDS = (function () {
       throw new Error('html2canvas not loaded');
     }
 
-    // 1. 克隆卡片
+    // 0. 确保字体就绪，否则 html2canvas 用后备字体 → 行距不同
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+
+    // 1. 读取原卡片的实际内容区高度（用于后面 max-height 换算）
+    const origContent = cardEl.querySelector('.card-content');
+    const contentH = origContent ? origContent.clientHeight : 1090;
+
+    // 2. 克隆卡片
     const clone = cardEl.cloneNode(true);
-    // 2. 去掉 transform，强制 1080×1440 全尺寸渲染
-    clone.style.cssText = `
-      position: absolute; left: -10000px; top: 0;
-      transform: none !important;
-      width: ${W}px; height: ${H}px;
-      pointer-events: none;
-    `;
+    //    逐属性设 style，不覆写 cssText（保留 makeCardEl 设的 color 等内联样式）
+    clone.style.position = 'absolute';
+    clone.style.left = '-10000px';
+    clone.style.top = '0';
+    clone.style.transform = 'none';
+    clone.style.width = W + 'px';
+    clone.style.height = H + 'px';
+    clone.style.pointerEvents = 'none';
     document.body.appendChild(clone);
 
-    // 2b. 百分比 max-height → 像素值 (html2canvas 不会算 %)
-    //     卡片 1440px, 内容区 top:200 bottom:150 → 1090px
-    const CONTENT_H = 1090;
+    // 3. 百分比 max-height → 像素值
     clone.querySelectorAll('img').forEach(img => {
       const pct = parseFloat(img.style.maxHeight);
       const ratio = (!isNaN(pct) ? pct : 88) / 100;
-      img.style.maxHeight = Math.floor(CONTENT_H * ratio) + 'px';
+      img.style.maxHeight = Math.floor(contentH * ratio) + 'px';
     });
 
-    // 2c. 头像：清掉可能产生黑边的样式，加 overflow:hidden 兜底
-    clone.querySelectorAll('.card-avatar').forEach(av => {
-      av.style.border = 'none';
-      av.style.outline = 'none';
-      av.style.boxShadow = 'none';
-      av.style.background = 'transparent';
-      // 父容器加 overflow:hidden 配合 border-radius 裁边
-      const wrap = av.closest('.card-avatar-wrap');
-      if (wrap) { wrap.style.overflow = 'hidden'; }
-    });
+    // 4. 头像：canvas 裁成正圆形（彻底杜绝椭圆和黑边）
+    await Promise.all(
+      Array.from(clone.querySelectorAll('.card-avatar')).map(async (av) => {
+        try {
+          if (!av.complete) await new Promise(r => { av.onload = r; av.onerror = r; });
+          const w = av.naturalWidth, h = av.naturalHeight;
+          if (!w || !h) return;
+          // 头像显示尺寸（noir=120, violet=64, 默认=88）
+          const disp = Math.max(av.offsetWidth, av.offsetHeight, 1);
+          const size = disp * 2; // 2x 清晰度
+          const c = document.createElement('canvas');
+          c.width = size; c.height = size;
+          const ctx = c.getContext('2d');
+          // 圆形裁剪区
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+          ctx.clip();
+          // cover 居中缩放
+          const scale = Math.max(size / w, size / h);
+          const sw = size / scale, sh = size / scale;
+          ctx.drawImage(av, (w - sw) / 2, (h - sh) / 2, sw, sh, 0, 0, size, size);
+          // 替换 src
+          av.src = c.toDataURL('image/png');
+          av.style.borderRadius = '0';
+          av.style.objectFit = 'fill';
+          // 等新 src 就绪
+          if (!av.complete) await new Promise(r => { av.onload = r; av.onerror = r; });
+        } catch (_) { /* 不阻塞 */ }
+      })
+    );
 
-    // 3. 等所有图片加载完（含头像替换后的新 src）
+    // 5. 等其余图片加载完
     await Promise.all(
       Array.from(clone.querySelectorAll('img')).map(img => {
         if (img.complete && img.naturalWidth > 0) return Promise.resolve();
         return new Promise(r => {
           img.onload = r;
           img.onerror = r;
-          // 安全超时 8 秒
           setTimeout(r, 8000);
         });
       })
     );
 
-    // 等浏览器再画一帧，确保布局稳定
+    // 等一帧，确保布局彻底稳定
     await new Promise(r => requestAnimationFrame(r));
 
     try {
