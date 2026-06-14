@@ -518,17 +518,6 @@
       img.src = dataUrl;
       editor.appendChild(img);
     }
-    // 立即约束新插入的图片尺寸，防止分页时跳页
-    requestAnimationFrame(() => {
-      const imgs = editor.querySelectorAll('img');
-      if (imgs.length > 0) {
-        const lastImg = imgs[imgs.length - 1];
-        // 卡片内容区 1090px，图片不应超过 75%（给标题/文字留空间）
-        lastImg.style.maxHeight = '820px';
-        lastImg.style.maxWidth = '100%';
-        lastImg.style.objectFit = 'contain';
-      }
-    });
   }
 
   // 简易 HTML 消毒：保留常见格式标签 + style 中的 color/font-weight
