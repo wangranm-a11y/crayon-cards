@@ -152,6 +152,7 @@ window.CARDS = (function () {
 
     function commit() {
       if (buffer.length) {
+        console.log('    📄 COMMIT 页', pages.length, ', buffer 块数:', buffer.length, ', 含图:', buffer.some(h => h.includes('<img')));
         pages.push(buffer.join(''));
         buffer = [];
       }
@@ -287,9 +288,18 @@ window.CARDS = (function () {
     const queue = blocks.slice();
     let stallCount = 0;  // 防无限循环
 
+    // DEBUG: 打印所有块信息
+    const _blockInfo = blocks.map((b, i) => `${i}:<${b.tagName}>${b.tagName==='IMG'?'[IMG]':b.textContent?.slice(0,30)||''}`).join(', ');
+    console.log('🖍️ splitIntoPages: blocks =', _blockInfo, '| pages so far:', pages.length);
+
     while (queue.length > 0) {
       const block = queue.shift();
       const html = block.outerHTML;
+
+      // DEBUG: 打印当前处理的块
+      console.log('  🔹 block:', block.tagName, blockHasImage(block)?'🖼️':'📝',
+        '| bufferLen:', buffer.length, '| queueLen:', queue.length,
+        '| pageIdx:', pages.length);
 
       // 安全阀：同一个块反复塞不下时直接提交当前页
       if (stallCount > 50) {
@@ -302,9 +312,11 @@ window.CARDS = (function () {
 
       // 1) 整块能塞进当前卡 → 直接塞
       if (tryFit(html)) {
+        console.log('    ✅ tryFit OK, 直接塞入 buffer');
         buffer.push(html);
         continue;
       }
+      console.log('    ❌ tryFit 失败, contentH:', content.clientHeight, 'overflowH:', content.scrollHeight);
 
       // 2) 当前卡已有内容 → 先尝试句级贪心填满
       if (buffer.length > 0) {
@@ -316,12 +328,15 @@ window.CARDS = (function () {
         }
         // 图片/含图块：尝试智能缩放以适配剩余空间（封面页必须留住图片）
         if (blockHasImage(block)) {
+          console.log('    🎯 case2: 尝试 scaleImageToFit (buffer有内容)');
           const scaled = scaleImageToFit(block, content, buffer.join(''));
           if (scaled) {
+            console.log('    ✅ scaleImageToFit 成功, maxH:', scaled.style?.maxHeight || scaled.querySelector('img')?.style?.maxHeight);
             buffer.push(scaled.outerHTML);
             commit();
             continue;
           }
+          console.log('    ❌ scaleImageToFit 返回 null, 放回队列');
           // 缩放失败 → 把图片放回队列，等下一页再处理
           queue.unshift(block);
         }
@@ -345,11 +360,14 @@ window.CARDS = (function () {
 
       // 4b) 图片/含图块：空卡也装不下 → 智能缩放到整页可用高度
       if (blockHasImage(block)) {
+        console.log('    🎯 case4b: 空卡 + 图片, 尝试 scaleImageToFit');
         const scaled = scaleImageToFit(block, content, '');
         if (scaled) {
+          console.log('    ✅ scaleImageToFit 成功 (空卡), maxH:', scaled.style?.maxHeight || scaled.querySelector('img')?.style?.maxHeight);
           buffer.push(scaled.outerHTML);
           continue;
         }
+        console.log('    ❌ scaleImageToFit 返回 null (空卡), 进入 splitOneBlock');
       }
 
       // 5) 句级也搞不定（无句号的极长一句 / 图片） → 走兜底拆块
@@ -455,7 +473,9 @@ window.CARDS = (function () {
     const safeMargin = 0.85;
     const availableForImage = Math.floor((totalAvailable - usedHeight) * safeMargin);
 
-    if (availableForImage < 60) return null; // 空间太小
+    console.log('      📏 totalAvailable:', totalAvailable, 'usedHeight:', usedHeight, 'availableForImage:', availableForImage, 'existingHTML len:', existingHTML.length);
+
+    if (availableForImage < 60) { console.log('      ❌ availableForImage < 60, return null'); return null; } // 空间太小
 
     // 2. 测量图片自然渲染高度（去掉所有尺寸限制）
     const testImg = imgEl.cloneNode(true);
@@ -479,6 +499,8 @@ window.CARDS = (function () {
     contentEl.innerHTML = existingHTML + testHTML;
     const fullHeight = contentEl.scrollHeight;
     const imageNaturalHeight = fullHeight - usedHeight;
+
+    console.log('      📐 fullHeight:', fullHeight, 'imageNaturalHeight:', imageNaturalHeight, 'wrapperTag:', wrapperTag);
 
     // 如果自然高度已经在可用范围内，给图片设 max-height 为可用高度即可
     // （不返回 null —— tryFit 失败了说明有其他因素，直接设 max-height 最安全）
