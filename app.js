@@ -689,33 +689,56 @@
       avatar: state.avatar,
     };
 
-    // 1. 准备拆页输入（如果有标题，把它作为大字 H1 加在最前面，
-    //    这样"标题"和"正文开头"会出现在同一张卡上，标题更醒目）
+    // 1. 准备拆页输入 — 封面页单独处理：标题 + 首图，正文从第 2 页开始
     let workEditor = editor;
+    let coverHTML = null; // 封面页 HTML
+
     if (useCover) {
       workEditor = editor.cloneNode(true);
       const h1 = document.createElement('h1');
       h1.className = 'cover-title-inline';
       h1.textContent = state.title;
       workEditor.insertBefore(h1, workEditor.firstChild);
+
+      // 提取首张图片放到封面页，正文不含标题和首图
+      const firstImg = workEditor.querySelector('img');
+      if (firstImg) {
+        // 封面 = 标题 + 首图
+        coverHTML = h1.outerHTML + firstImg.outerHTML;
+        const parent = firstImg.parentNode;
+        firstImg.remove();
+        if (parent && parent !== workEditor && !parent.textContent.trim() && !parent.querySelector('img')) {
+          parent.remove();
+        }
+      } else {
+        coverHTML = h1.outerHTML;
+      }
+      // 从正文编辑器中移除标题（已在封面页上了）
+      h1.remove();
     }
 
-    // 2. 拆页
-    let pages;
-    try {
-      pages = window.CARDS.splitIntoPages(workEditor, state.theme, totalOpts);
-    } catch (e) {
-      console.error('splitIntoPages error:', e);
-      list.innerHTML = '<p style="text-align:center;color:#c84b31;">拼版失败：' + e.message + '</p><p style="text-align:center;color:#a89e8a;font-size:13px;">请尝试缩短内容或更换主题</p>';
-      return;
+    // 2. 拆页 — 正文内容（不含首图）
+    let pages = [];
+    const hasBody = workEditor.textContent.trim() || workEditor.querySelector('img');
+    if (hasBody) {
+      try {
+        pages = window.CARDS.splitIntoPages(workEditor, state.theme, totalOpts);
+      } catch (e) {
+        console.error('splitIntoPages error:', e);
+        list.innerHTML = '<p style="text-align:center;color:#c84b31;">拼版失败：' + e.message + '</p>';
+        return;
+      }
     }
-    if (!pages || pages.length === 0) {
+
+    if (!coverHTML && pages.length === 0) {
       list.innerHTML = '<p style="text-align:center;color:#a89e8a;">未能生成卡片，请检查内容后重试</p>';
       return;
     }
 
-    // 3. 直接渲染每张内容卡（不再有单独的 cover 页）
-    const allItems = pages.map(p => ({ type: 'content', html: p.contentHTML }));
+    // 3. 组装：封面页 → 正文页
+    const allItems = [];
+    if (coverHTML) allItems.push({ type: 'content', html: coverHTML });
+    pages.forEach(p => allItems.push({ type: 'content', html: p.contentHTML }));
 
     const total = allItems.length;
     list.innerHTML = '';
