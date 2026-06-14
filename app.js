@@ -689,71 +689,32 @@
       avatar: state.avatar,
     };
 
-    // 1. 准备拆页输入 — 封面页单独处理：标题 + 首图，正文从第 2 页开始
+    // 1. 准备拆页输入：有标题则在最前面加标题大字，和正文一起分页
     let workEditor = editor;
-    let coverHTML = null; // 封面页 HTML
-
     if (useCover) {
       workEditor = editor.cloneNode(true);
       const h1 = document.createElement('h1');
       h1.className = 'cover-title-inline';
       h1.textContent = state.title;
       workEditor.insertBefore(h1, workEditor.firstChild);
-
-      // 判断首图是否在文章最开头（前面没有正文），是才放封面
-      const firstImg = workEditor.querySelector('img');
-      let imgAtStart = false;
-      if (firstImg) {
-        imgAtStart = true;
-        let sib = h1.nextSibling;
-        while (sib) {
-          if (sib === firstImg || sib.contains(firstImg)) break; // 找到图，前面无正文
-          const t = sib.textContent || '';
-          if (sib.nodeType === Node.TEXT_NODE ? t.trim() : (sib.tagName !== 'BR' && t.trim())) {
-            imgAtStart = false; break; // 图前有正文
-          }
-          sib = sib.nextSibling;
-        }
-      }
-
-      if (firstImg && imgAtStart) {
-        // 首图在最开头 → 提取到封面
-        coverHTML = h1.outerHTML + firstImg.outerHTML;
-        const parent = firstImg.parentNode;
-        firstImg.remove();
-        if (parent && parent !== workEditor && !parent.textContent.trim() && !parent.querySelector('img')) {
-          parent.remove();
-        }
-      } else {
-        // 无图或图不在开头 → 封面只有标题
-        coverHTML = h1.outerHTML;
-      }
-      // 从正文编辑器中移除标题（已在封面页上了）
-      h1.remove();
     }
 
-    // 2. 拆页 — 正文内容（不含首图）
-    let pages = [];
-    const hasBody = workEditor.textContent.trim() || workEditor.querySelector('img');
-    if (hasBody) {
-      try {
-        pages = window.CARDS.splitIntoPages(workEditor, state.theme, totalOpts);
-      } catch (e) {
-        console.error('splitIntoPages error:', e);
-        list.innerHTML = '<p style="text-align:center;color:#c84b31;">拼版失败：' + e.message + '</p>';
-        return;
-      }
+    // 2. 拆页
+    let pages;
+    try {
+      pages = window.CARDS.splitIntoPages(workEditor, state.theme, totalOpts);
+    } catch (e) {
+      console.error('splitIntoPages error:', e);
+      list.innerHTML = '<p style="text-align:center;color:#c84b31;">拼版失败：' + e.message + '</p><p style="text-align:center;color:#a89e8a;font-size:13px;">请尝试缩短内容或更换主题</p>';
+      return;
     }
-
-    if (!coverHTML && pages.length === 0) {
+    if (!pages || pages.length === 0) {
       list.innerHTML = '<p style="text-align:center;color:#a89e8a;">未能生成卡片，请检查内容后重试</p>';
       return;
     }
 
-    // 3. 组装：封面页 → 正文页
-    const allItems = [];
-    if (coverHTML) allItems.push({ type: 'content', html: coverHTML });
-    pages.forEach(p => allItems.push({ type: 'content', html: p.contentHTML }));
+    // 3. 渲染每张内容卡
+    const allItems = pages.map(p => ({ type: 'content', html: p.contentHTML }));
 
     const total = allItems.length;
     list.innerHTML = '';
