@@ -523,13 +523,14 @@ window.CARDS = (function () {
     document.body.appendChild(clone);
 
     // 2b. 把百分比 max-height 转为像素值，html2canvas 才能正确渲染
+    //     CSS 默认 88%，inline（splitOneBlock 兜底）读实际值
     const contentEl = clone.querySelector('.card-content');
     if (contentEl) {
       const ch = contentEl.clientHeight;
       clone.querySelectorAll('img').forEach(img => {
         const pct = parseFloat(img.style.maxHeight);
-        if (!isNaN(pct)) { img.style.maxHeight = Math.floor(ch * pct / 100) + 'px'; }
-        else { img.style.maxHeight = Math.floor(ch * 0.72) + 'px'; }
+        const ratio = (!isNaN(pct) ? pct : 88) / 100;
+        img.style.maxHeight = Math.floor(ch * ratio) + 'px';
       });
     }
 
