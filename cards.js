@@ -314,6 +314,15 @@ window.CARDS = (function () {
           if (r.remainder) queue.unshift(r.remainder);
           continue;
         }
+        // 图片/含图块：尝试智能缩放以适配剩余空间（封面页必须留住图片）
+        if (blockHasImage(block)) {
+          const scaled = scaleImageToFit(block, content, buffer.join(''));
+          if (scaled) {
+            buffer.push(scaled.outerHTML);
+            commit();
+            continue;
+          }
+        }
         // 一句都塞不下 → 提交当前卡，下一轮在空卡上重试
         commit();
       }
@@ -330,6 +339,15 @@ window.CARDS = (function () {
         commit();
         if (r2.remainder) queue.unshift(r2.remainder);
         continue;
+      }
+
+      // 4b) 图片/含图块：空卡也装不下 → 智能缩放到整页可用高度
+      if (blockHasImage(block)) {
+        const scaled = scaleImageToFit(block, content, '');
+        if (scaled) {
+          buffer.push(scaled.outerHTML);
+          continue;
+        }
       }
 
       // 5) 句级也搞不定（无句号的极长一句 / 图片） → 走兜底拆块
@@ -402,13 +420,129 @@ window.CARDS = (function () {
   }
 
   /**
+   * 智能缩放图片：按可用空间自动计算最佳 max-height
+   * 采用二分查找找到图片能完整显示的最大高度
+   * @param {HTMLElement} imgBlock — IMG 元素（独立或包裹在 p/div 中）
+   * @param {HTMLElement} contentEl — 测试卡的 .card-content 元素
+   * @param {string} existingHTML — 当前页已累积的 HTML 字符串
+   * @returns {HTMLElement|null} 缩放后的元素克隆，或 null 表示无需缩放/无法缩放
+   */
+  function scaleImageToFit(imgBlock, contentEl, existingHTML) {
+    // 提取实际的 IMG 元素
+    let imgEl, wrapperTag;
+    if (imgBlock.tagName === 'IMG') {
+      imgEl = imgBlock;
+      wrapperTag = null;
+    } else {
+      imgEl = imgBlock.querySelector('img');
+      wrapperTag = imgEl ? imgBlock.tagName : null;
+    }
+    if (!imgEl) return null;
+
+    // 1. 测量已占用高度
+    contentEl.innerHTML = existingHTML;
+    const usedHeight = contentEl.scrollHeight;
+    const totalAvailable = contentEl.clientHeight;
+    // 留 8% 安全边距，确保图片放得下
+    const safeMargin = 0.92;
+    const availableForImage = Math.floor((totalAvailable - usedHeight) * safeMargin);
+
+    if (availableForImage < 80) return null; // 空间太小，不值得缩放
+
+    // 2. 测量图片自然渲染高度（去掉所有尺寸限制）
+    const testImg = imgEl.cloneNode(true);
+    testImg.style.maxHeight = 'none';
+    testImg.style.maxWidth = '100%';
+    testImg.style.height = 'auto';
+    testImg.style.width = 'auto';
+    testImg.style.objectFit = 'none';
+
+    if (wrapperTag) {
+      const wrapper = document.createElement(wrapperTag.toLowerCase());
+      wrapper.appendChild(testImg);
+      contentEl.innerHTML = existingHTML + wrapper.outerHTML;
+    } else {
+      contentEl.innerHTML = existingHTML + testImg.outerHTML;
+    }
+    const fullHeight = contentEl.scrollHeight;
+    const imageNaturalHeight = fullHeight - usedHeight;
+
+    // 3. 图像自然高度 ≤ 可用空间 → 无需缩放
+    if (imageNaturalHeight <= availableForImage) return null;
+
+    // 4. 二分查找最佳 max-height（精确到像素）
+    let lo = 80, hi = availableForImage, best = 80;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      const tryImg = imgEl.cloneNode(true);
+      tryImg.style.maxHeight = mid + 'px';
+      tryImg.style.maxWidth = '100%';
+      tryImg.style.height = 'auto';
+      tryImg.style.width = 'auto';
+      tryImg.style.objectFit = 'contain';
+
+      if (wrapperTag) {
+        const wrapper = document.createElement(wrapperTag.toLowerCase());
+        wrapper.appendChild(tryImg);
+        contentEl.innerHTML = existingHTML + wrapper.outerHTML;
+      } else {
+        contentEl.innerHTML = existingHTML + tryImg.outerHTML;
+      }
+
+      if (contentEl.scrollHeight <= contentEl.clientHeight) {
+        best = mid;
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
+    }
+
+    // 5. 构建缩放结果
+    if (wrapperTag) {
+      const result = document.createElement(wrapperTag.toLowerCase());
+      const scaledImg = imgEl.cloneNode(true);
+      scaledImg.style.maxHeight = best + 'px';
+      scaledImg.style.maxWidth = '100%';
+      scaledImg.style.height = 'auto';
+      scaledImg.style.width = 'auto';
+      scaledImg.style.objectFit = 'contain';
+      result.appendChild(scaledImg);
+      return result;
+    } else {
+      const result = imgEl.cloneNode(true);
+      result.style.maxHeight = best + 'px';
+      result.style.maxWidth = '100%';
+      result.style.height = 'auto';
+      result.style.width = 'auto';
+      result.style.objectFit = 'contain';
+      return result;
+    }
+  }
+
+  /**
+   * 检查块是否包含图片（独立 IMG 或内部包含 img）
+   */
+  function blockHasImage(block) {
+    if (block.tagName === 'IMG') return true;
+    return !!block.querySelector('img');
+  }
+
+  /**
    * 把单个塞不下的块按句/字符再拆
    */
   function splitOneBlock(block, fitContainer) {
     const tagName = block.tagName;
-    // 图片单独成块装不下 → 强行缩小
-    if (tagName === 'IMG') {
-      block.style.maxHeight = '60%';
+    // 图片/含图块装不下 → 智能缩放
+    if (blockHasImage(block)) {
+      // 作为最后的兜底保险：用 60% 或缩放结果中较小的
+      const scaled = scaleImageToFit(block, fitContainer, '');
+      if (scaled) return [scaled];
+      // 如果 scaleImageToFit 也返回 null，用 60% 硬兜底
+      const fallbackH = Math.floor(fitContainer.clientHeight * 0.6);
+      block.style.maxHeight = Math.min(fallbackH, 800) + 'px';
+      block.style.maxWidth = '100%';
+      block.style.height = 'auto';
+      block.style.width = 'auto';
       block.style.objectFit = 'contain';
       return [block];
     }
