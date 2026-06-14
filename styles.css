@@ -883,11 +883,11 @@ input[type="text"]:focus { border-color: var(--accent); }
 /* 图片：用后代选择器，覆盖 contenteditable 把 <img> 包进 <p> 的情况 */
 .card-content img {
   max-width: 100%;
-  max-height: 60%;
+  max-height: 66%;
   width: auto;
   height: auto;
   border-radius: 8px;
-  margin: 16px 0;
+  margin: 12px 0;
   display: block;
   object-fit: contain;
 }
@@ -1537,19 +1537,19 @@ input[type="text"]:focus { border-color: var(--accent); }
 .card-content > h1.cover-title-inline {
   font-family: var(--font-serif);
   font-weight: 900;
-  font-size: 112px;
-  line-height: 1.16;
-  margin: 0 0 46px;
-  letter-spacing: -0.025em;
+  font-size: 72px;
+  line-height: 1.2;
+  margin: 0 0 32px;
+  letter-spacing: -0.02em;
   position: relative;
 }
 .card-content > h1.cover-title-inline::after {
   content: '';
   display: block;
-  width: 124px;
-  height: 7px;
+  width: 96px;
+  height: 5px;
   background: var(--card-accent, currentColor);
-  margin-top: 28px;
+  margin-top: 20px;
   border-radius: 2px;
 }
 

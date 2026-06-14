@@ -700,14 +700,7 @@
       workEditor.insertBefore(h1, workEditor.firstChild);
     }
 
-    // 2. 预处理图片：约束最大高度，保证封面页容纳 + 加速分页测量
-    workEditor.querySelectorAll('img').forEach(img => {
-      img.style.maxHeight = '680px';
-      img.style.maxWidth = '100%';
-      img.style.objectFit = 'contain';
-    });
-
-    // 3. 拆页
+    // 2. 拆页
     let pages;
     try {
       pages = window.CARDS.splitIntoPages(workEditor, state.theme, totalOpts);
