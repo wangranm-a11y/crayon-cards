@@ -747,7 +747,7 @@ input[type="text"]:focus { border-color: var(--accent); }
 }
 .card-font-handwrite .card-content > p { line-height: 1.95; }
 .card-font-huiwen .card-content,
-.card-font-huiwen .card-content > *:not(h1):not(h2):not(h3),
+.card-font-huiwen .card-content > *,
 .card-font-huiwen .card-avatar-name {
   font-family: 'Huiwen-mincho', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif;
   letter-spacing: 0.03em;
@@ -1553,6 +1553,14 @@ input[type="text"]:focus { border-color: var(--accent); }
   border-radius: 2px;
 }
 
+/* Huiwen must win over theme title rules, especially for CLI exports. */
+.card-font-huiwen,
+.card-font-huiwen .card-content,
+.card-font-huiwen .card-content > *,
+.card-font-huiwen .card-avatar-name {
+  font-family: 'Huiwen-mincho', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif !important;
+}
+
 /* 每个主题的 accent 色 */
 .card-cream { --card-accent: #c84b31; --card-tag-bg: rgba(200,75,49,0.12); --card-tag-fg: #c84b31; --card-tag-border: rgba(200,75,49,0.32); }
 .card-indigo { --card-accent: #a98be0; --card-tag-bg: rgba(201,184,224,0.12); --card-tag-fg: #c9b8e0; --card-tag-border: rgba(201,184,224,0.35); }
@@ -1562,4 +1570,3 @@ input[type="text"]:focus { border-color: var(--accent); }
 .card-editorial { --card-accent: #b8956a; }
 .card-violet { --card-accent: #c9b8e0; --card-tag-bg: rgba(201,184,224,0.12); --card-tag-fg: #c9b8e0; --card-tag-border: rgba(201,184,224,0.35); }
 .card-noir { --card-accent: #d2c1de; --card-tag-bg: rgba(210,193,222,0.12); --card-tag-fg: #d2c1de; --card-tag-border: rgba(210,193,222,0.35); }
-

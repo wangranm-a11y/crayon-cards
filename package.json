@@ -1,0 +1,17 @@
+{
+  "name": "crayon-cards",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "crayon-cards": "./bin/crayon-cards.mjs"
+  },
+  "scripts": {
+    "cards": "node ./bin/crayon-cards.mjs",
+    "serve": "python3 -m http.server 8765"
+  },
+  "dependencies": {
+    "@fontpkg/huiwen-mincho": "^1.0.0",
+    "puppeteer": "^24.42.0"
+  }
+}

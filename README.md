@@ -27,7 +27,65 @@ python3 -m http.server 8765
 # 打开 http://localhost:8765
 ```
 
-零依赖、零构建、纯静态。
+网页端零依赖、零构建、纯静态。
+
+## CLI / Agent 调用
+
+安装依赖并链接本机命令：
+
+```bash
+npm install
+npm link
+```
+
+生成卡片：
+
+```bash
+crayon-cards \
+  --title "今天的小确幸" \
+  --text "第一段正文。\n\n第二段正文。" \
+  --nickname "蜡笔不拿笔" \
+  --tag "读书笔记" \
+  --output-dir ./out \
+  --json
+```
+
+CLI 默认使用：
+
+- 主题：`charcoal`（炭笔速写）
+- 字体：`huiwen`（汇文明朝体，本地 OTF）
+- 输出：1080×1440 PNG
+
+也可以把完整配置放进 JSON，适合 agent 稳定调用：
+
+```json
+{
+  "title": "今天的小确幸",
+  "text": "第一段正文。\n\n第二段正文。",
+  "nickname": "蜡笔不拿笔",
+  "tag": "读书笔记",
+  "outputDir": "./out",
+  "json": true
+}
+```
+
+```bash
+crayon-cards --config card.json
+```
+
+CLI 会复用网页里的同一套 `cards.js` 排版和导出逻辑，输出 1080×1440 PNG；`--json` 会打印 `{ ok, count, width, height, files }`，方便 agent 继续读取结果路径。
+
+### 汇文明朝字体
+
+为了避免浏览器导出时远程字体加载失败，CLI 会优先使用本地 OTF：
+
+1. `CRAYON_HUIWEN_FONT` 环境变量
+2. `--huiwen-font /path/to/Huiwen-mincho.otf`
+3. `/tmp/crayon-cards/Huiwen-mincho.otf`
+4. `node_modules/@fontpkg/huiwen-mincho/Huiwen-mincho.otf`
+5. `fonts/Huiwen-mincho.otf`
+
+如果 `--font huiwen` 找不到本地 OTF，CLI 会直接报错，避免静默回退成宋体或其它字体。
 
 ## License
 
